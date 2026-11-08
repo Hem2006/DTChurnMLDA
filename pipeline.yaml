@@ -1,0 +1,28 @@
+# How a customer export maps onto the model's inputs (used by `python -m app.pipeline run` and the dashboard upload).
+# The defaults fit the Telco CSV in this repo. For the telco's own export, change the names on the LEFT to the names in THEIR file.
+# Contains no business numbers.
+
+# Source column that uniquely identifies the customer. It becomes customer_ref in the queue and the outbox,
+# so the CRM can join contact details back on. 1-64 letters, digits, - or _.
+id_column: customerID
+
+# Source column with the customer's FIRST NAME. The Telco data has none, so leave null: cases that are cleared for a message then
+# wait in `needs_first_name` until a name is supplied (queue page, or `python -m app.pipeline name ID Maria`).
+first_name_column: null
+
+# Rename source columns to the model's field names:  source_name: model_field   (only for columns that differ)
+# e.g.   cust_tenure_months: tenure
+columns: {}
+
+# Operational state the model data does not have. Map the four fields to source columns if the CRM export has them:
+#   field: source_column
+# Anything left out is UNKNOWN, and unknown is never assumed safe: those cases wait for a human (see guardrails.yaml).
+account_state: {}
+#  vulnerable: vulnerable_flag
+#  escalated: open_complaint
+#  contacts_this_month: retention_contacts_30d
+#  discount_pct_used_this_quarter: discount_pct_qtd
+
+# Text values read as true / false in the vulnerable and escalated columns (case-insensitive). Anything else = unknown.
+true_values: ["yes", "y", "true", "1"]
+false_values: ["no", "n", "false", "0"]

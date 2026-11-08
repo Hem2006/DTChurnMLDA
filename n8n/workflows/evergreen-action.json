@@ -1,0 +1,478 @@
+{
+  "name": "Evergreen - carry out approved action",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "evergreen-action",
+        "responseMode": "onReceived",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "20b5607c-ae82-5bd0-aaa0-256fc51900e5",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "webhookId": "aae7b606-d680-5dad-9d00-2f41ce5cf19b"
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "binaryPropertyName": "data",
+        "options": {}
+      },
+      "id": "9ba57cb8-0798-5f45-915b-956e90fadea3",
+      "name": "Raw body to text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        220,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "action": "hmac",
+        "type": "SHA256",
+        "value": "={{ $json.data }}",
+        "dataPropertyName": "computed",
+        "secret": "={{ $env.N8N_SHARED_SECRET }}",
+        "encoding": "hex"
+      },
+      "id": "7e9801f9-6f38-5149-9cb3-b60290112670",
+      "name": "Compute signature",
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [
+        440,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ebb4e7fe-c330-582c-bccd-e2012c9980d2",
+              "leftValue": "={{ 'sha256=' + $json.computed }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "={{ $('Webhook').first().json.headers['x-evergreen-signature'] }}"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f5b1b77a-f459-5a71-8785-e0c9c77457dd",
+      "name": "Signature valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        660,
+        300
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "6a01d062-08b1-5baf-aef5-772a6e4437e9",
+      "name": "Ignore: bad signature",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        900,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e57f6225-413e-575e-a0de-57969fdb9ef7",
+              "name": "text",
+              "value": "={{ '*Approved retention action #' + $('Webhook').first().json.body.action_id + '* for customer ' + $('Webhook').first().json.body.customer_ref + '\\n' + $('Webhook').first().json.body.proposed_change_text + '\\nModel risk ' + Math.round($('Webhook').first().json.body.risk.before * 100) + '% -> ' + Math.round($('Webhook').first().json.body.risk.after * 100) + '%' + ' (' + $('Webhook').first().json.body.labels.interpretation + ')\\nProposed by ' + $('Webhook').first().json.body.requested_by + ', approved by ' + $('Webhook').first().json.body.approved_by }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5ccbc203-c71b-5f7f-9ed3-cefeae0f1565",
+      "name": "Build message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        900,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3fe2f474-322b-58d3-9b4f-472da5e59c99",
+              "leftValue": "={{ $env.SLACK_WEBHOOK_URL }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "30bebf17-bba0-5996-b8d1-48a88485ac9d",
+      "name": "Slack configured?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SLACK_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: $json.text }) }}",
+        "options": {}
+      },
+      "id": "814a1853-8b58-5df8-bd87-e8ddba9c60ae",
+      "name": "Post to Slack",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1340,
+        120
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7195bfc8-33c2-5d7d-b56e-eb1c8df0d43e",
+              "name": "status",
+              "value": "done",
+              "type": "string"
+            },
+            {
+              "id": "efe30017-b859-545d-83b6-36a388224b10",
+              "name": "detail",
+              "value": "Posted to Slack",
+              "type": "string"
+            },
+            {
+              "id": "a46b1bcc-ae54-5b4c-8721-3080be03c772",
+              "name": "external_ref",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a9357705-7647-5a67-83e7-e5aec1d93f63",
+      "name": "Result: posted",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1560,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6242d8e8-3758-5559-8ed5-943c5d08da6c",
+              "name": "status",
+              "value": "failed",
+              "type": "string"
+            },
+            {
+              "id": "a04f217f-20ba-5c97-b43e-c8ecb9873842",
+              "name": "detail",
+              "value": "={{ 'Slack post failed: ' + ($json.error && $json.error.message ? $json.error.message : 'unknown error') }}",
+              "type": "string"
+            },
+            {
+              "id": "30834498-9809-5a56-827e-a5e7be57ef34",
+              "name": "external_ref",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c75b5fa8-2f2f-5c53-b393-0724a17c9ff8",
+      "name": "Result: failed",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1560,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "96621ddc-c7ab-5a70-873e-3c8429e4a02a",
+              "name": "status",
+              "value": "done",
+              "type": "string"
+            },
+            {
+              "id": "539fe852-28f7-5aef-9943-bee903832b4b",
+              "name": "detail",
+              "value": "Recorded in n8n only: SLACK_WEBHOOK_URL is not set, so nothing was posted",
+              "type": "string"
+            },
+            {
+              "id": "986abd04-71df-5e8e-bda1-91a1122936b1",
+              "name": "external_ref",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "10ba282f-2de7-5f3e-a26a-00dcdda07690",
+      "name": "Result: logged only",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1340,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').first().json.body.callback.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Evergreen-Secret",
+              "value": "={{ $env.N8N_SHARED_SECRET }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ status: $json.status, detail: $json.detail, external_ref: $json.external_ref || null }) }}",
+        "options": {}
+      },
+      "id": "3006c666-0f9e-5997-99e4-394905723e18",
+      "name": "Report back to Evergreen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1800,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Evergreen: carry out an approved action\n\nThe Evergreen app calls this webhook only AFTER a named person approved the action. The call is signed (HMAC-SHA256 of the raw body, header `x-evergreen-signature`); this flow recomputes it and ignores anything that does not match.\n\nThe payload has the customer REF only: no name, email or phone.",
+        "height": 200,
+        "width": 420,
+        "color": 4
+      },
+      "id": "5589ba89-f476-56e0-b873-089237312cf8",
+      "name": "Note: what this is",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Swap in your own step\n\nOut of the box the action is posted to Slack when `SLACK_WEBHOOK_URL` is set, otherwise only recorded here (and reported back honestly as such).\n\nReplace or add nodes here: Google Sheets row, CRM task, Gmail DRAFT (not send), Notion, Jira ... Whatever you add, keep the last node reporting back with status `done` or `failed`.",
+        "height": 200,
+        "width": 430,
+        "color": 5
+      },
+      "id": "8c52021e-e77b-52a5-8564-467f9749825e",
+      "name": "Note: swap in your step",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        460
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Raw body to text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Raw body to text": {
+      "main": [
+        [
+          {
+            "node": "Compute signature",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute signature": {
+      "main": [
+        [
+          {
+            "node": "Signature valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Signature valid?": {
+      "main": [
+        [
+          {
+            "node": "Build message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ignore: bad signature",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build message": {
+      "main": [
+        [
+          {
+            "node": "Slack configured?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack configured?": {
+      "main": [
+        [
+          {
+            "node": "Post to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Result: logged only",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Slack": {
+      "main": [
+        [
+          {
+            "node": "Result: posted",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Result: failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Result: posted": {
+      "main": [
+        [
+          {
+            "node": "Report back to Evergreen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Result: failed": {
+      "main": [
+        [
+          {
+            "node": "Report back to Evergreen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Result: logged only": {
+      "main": [
+        [
+          {
+            "node": "Report back to Evergreen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "e415ef0c-c3c1-5a3e-b84f-09ab9991bb64",
+  "tags": []
+}

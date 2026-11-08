@@ -1,0 +1,30 @@
+# n8n next to the Evergreen API (the API runs on the host, port 8000).
+#
+#   cd n8n
+#   cp .env.example .env        # then set N8N_SHARED_SECRET (any long random string)
+#   docker compose up -d        # n8n UI at http://localhost:5678
+#
+# Start the API with the same secret and the webhook URL, see n8n/README.md.
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:2.43.8
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5678:5678"          # local only; put it behind your own auth/TLS before exposing it
+    environment:
+      N8N_SHARED_SECRET: ${N8N_SHARED_SECRET:?set N8N_SHARED_SECRET in n8n/.env}
+      EVERGREEN_URL: ${EVERGREEN_URL:-http://host.docker.internal:8000}
+      EVERGREEN_API_KEY: ${EVERGREEN_API_KEY:-}
+      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL:-}
+      N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"   # the workflows read the three variables above with $env
+      N8N_SECURE_COOKIE: "false"              # local http only; remove behind https
+      GENERIC_TIMEZONE: ${GENERIC_TIMEZONE:-UTC}
+      TZ: ${GENERIC_TIMEZONE:-UTC}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # lets n8n reach the API on the host (Linux needs this line)
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./workflows:/workflows:ro
+
+volumes:
+  n8n_data:

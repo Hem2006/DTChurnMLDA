@@ -1,0 +1,6 @@
+# Business numbers for the cost-based threshold t* = offer_cost / (success_rate * customer_value).
+# Leave them null until you have real figures: while any is null the threshold is the labelled F1 PLACEHOLDER
+# and no profit or value figure is claimed anywhere in the app.
+offer_cost: null        # cost of one retention offer
+customer_value: null    # value of keeping one customer (same currency/period as offer_cost)
+success_rate: null      # share of offers that actually retain a would-be churner, in (0, 1]

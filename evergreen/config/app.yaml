@@ -1,0 +1,3 @@
+# Demo mode shows one-click "quick sign-in" buttons on the login page (no password asked).
+# Set to false before anyone other than you can reach the app.
+demo_quick_login: true

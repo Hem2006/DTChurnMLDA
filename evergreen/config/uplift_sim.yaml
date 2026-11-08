@@ -1,0 +1,11 @@
+# SIMULATED uplift assumptions. The Telco data has NO treatment column, so treatment and its effect are simulated from these rules.
+# The numbers are arbitrary ASSUMPTIONS used only to exercise the T-learner. They are NOT findings and NOT business numbers.
+seed: 42
+treatment_probability: 0.5        # randomised assignment, independent of features (like an A/B test)
+# A treated customer who would have churned is retained with this probability, by current Contract.
+retention_probability_by_contract:
+  Month-to-month: 0.30
+  One year: 0.10
+  Two year: 0.0
+# Quadrant view only: customers with simulated uplift >= this count as 'persuadable' when their baseline risk is above the flag threshold.
+persuadable_min_uplift: 0.02

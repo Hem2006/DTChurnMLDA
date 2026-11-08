@@ -1,0 +1,330 @@
+{
+  "selected_model": "xgboost",
+  "calibration_method": "isotonic",
+  "seed": 42,
+  "threshold": 0.31500000000000006,
+  "threshold_source": "placeholder_f1_optimal_on_calibrated_oof",
+  "threshold_note": "PLACEHOLDER. No offer cost, customer value or success rate was supplied. F1 weighs a missed churner and a wasted offer equally; replace with offer_cost / (success_rate * customer_value) once real numbers exist.",
+  "input_columns": [
+    "SeniorCitizen",
+    "Partner",
+    "Dependents",
+    "tenure",
+    "PhoneService",
+    "MultipleLines",
+    "InternetService",
+    "OnlineSecurity",
+    "OnlineBackup",
+    "DeviceProtection",
+    "TechSupport",
+    "StreamingTV",
+    "StreamingMovies",
+    "Contract",
+    "PaperlessBilling",
+    "PaymentMethod",
+    "MonthlyCharges"
+  ],
+  "dropped_columns": [
+    "TotalCharges",
+    "gender"
+  ],
+  "feature_set_chosen": "D: drop TotalCharges + gender",
+  "totalcharges_mode": "drop",
+  "numeric_columns": [
+    "SeniorCitizen",
+    "tenure",
+    "MonthlyCharges"
+  ],
+  "categorical_columns": [
+    "Partner",
+    "Dependents",
+    "PhoneService",
+    "MultipleLines",
+    "InternetService",
+    "OnlineSecurity",
+    "OnlineBackup",
+    "DeviceProtection",
+    "TechSupport",
+    "StreamingTV",
+    "StreamingMovies",
+    "Contract",
+    "PaperlessBilling",
+    "PaymentMethod"
+  ],
+  "categorical_levels": {
+    "Partner": [
+      "No",
+      "Yes"
+    ],
+    "Dependents": [
+      "No",
+      "Yes"
+    ],
+    "PhoneService": [
+      "No",
+      "Yes"
+    ],
+    "MultipleLines": [
+      "No",
+      "No phone service",
+      "Yes"
+    ],
+    "InternetService": [
+      "DSL",
+      "Fiber optic",
+      "No"
+    ],
+    "OnlineSecurity": [
+      "No",
+      "No internet service",
+      "Yes"
+    ],
+    "OnlineBackup": [
+      "No",
+      "No internet service",
+      "Yes"
+    ],
+    "DeviceProtection": [
+      "No",
+      "No internet service",
+      "Yes"
+    ],
+    "TechSupport": [
+      "No",
+      "No internet service",
+      "Yes"
+    ],
+    "StreamingTV": [
+      "No",
+      "No internet service",
+      "Yes"
+    ],
+    "StreamingMovies": [
+      "No",
+      "No internet service",
+      "Yes"
+    ],
+    "Contract": [
+      "Month-to-month",
+      "One year",
+      "Two year"
+    ],
+    "PaperlessBilling": [
+      "No",
+      "Yes"
+    ],
+    "PaymentMethod": [
+      "Bank transfer (automatic)",
+      "Credit card (automatic)",
+      "Electronic check",
+      "Mailed check"
+    ]
+  },
+  "explainer_model": "xgboost",
+  "versions": {
+    "python": "3.13.0",
+    "scikit-learn": "1.9.1",
+    "xgboost": "3.4.1",
+    "lightgbm": "4.7.0",
+    "shap": "0.53.0",
+    "pandas": "3.0.5",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "joblib": "1.6.0"
+  },
+  "test_metrics": {
+    "roc_auc": 0.8481180087318195,
+    "brier": 0.13472742604783333,
+    "precision": 0.5421455938697318,
+    "recall": 0.7566844919786097,
+    "f1": 0.6316964285714286,
+    "accuracy": 0.765791341376863,
+    "flag_rate": 0.37047551454932576
+  },
+  "test_metrics_ci95": {
+    "roc_auc": [
+      0.8255289286022975,
+      0.8686351383468135
+    ],
+    "brier": [
+      0.12456650228606597,
+      0.14514914496339587
+    ],
+    "precision": [
+      0.4981264473797067,
+      0.5838416608836455
+    ],
+    "recall": [
+      0.7125174447174447,
+      0.8005398514832477
+    ],
+    "f1": [
+      0.592755991285403,
+      0.66594850513573
+    ],
+    "accuracy": [
+      0.7430801987224982,
+      0.7863733144073811
+    ],
+    "flag_rate": [
+      0.3456352022711143,
+      0.39673527324343505
+    ]
+  },
+  "bootstrap_resamples": 2000,
+  "test_auc_baseline_contract_tenure": 0.7982588028623834,
+  "calibration_test": {
+    "brier_uncalibrated": 0.1425197273492813,
+    "brier_calibrated": 0.13472742604783333,
+    "brier_baseline_rate_only": 0.1949799619120813,
+    "ece_uncalibrated": 0.07107982853516101,
+    "ece_calibrated": 0.014111375828380008,
+    "mean_score_uncalibrated": 0.3365163207054138,
+    "mean_score_calibrated": 0.2671045306254697,
+    "observed_churn_rate_test": 0.2654364797728886
+  },
+  "ablation_mean_auc": {
+    "D: drop TotalCharges + gender": 0.8465270552832813,
+    "C: drop TotalCharges": 0.8463823264605095,
+    "B: TotalCharges blanks = 0": 0.8471022759253102,
+    "A: TotalCharges blanks = median (previous)": 0.8470837026761342
+  },
+  "nested_cv_auc": {
+    "logreg": {
+      "mean": 0.8436530842683195,
+      "sd": 0.018241969857913487
+    },
+    "random_forest": {
+      "mean": 0.8461805807702106,
+      "sd": 0.017105627037809462
+    },
+    "xgboost": {
+      "mean": 0.8500208052040351,
+      "sd": 0.01677806114509917
+    },
+    "lightgbm": {
+      "mean": 0.8501511765702604,
+      "sd": 0.017046867682320554
+    },
+    "baseline (Contract + tenure)": {
+      "mean": 0.7845790667206585,
+      "sd": 0.008692014145263653
+    }
+  },
+  "repeated_cv_auc": {
+    "baseline (Contract + tenure)": {
+      "mean": 0.7841509460558086,
+      "sd": 0.011467623868138082
+    },
+    "xgboost (tuned)": {
+      "mean": 0.8500299739119532,
+      "sd": 0.010651164220108453
+    }
+  },
+  "subgroups": [
+    {
+      "attribute": "gender",
+      "group": "Female",
+      "n": 687,
+      "churn_rate": 0.28093158660844253,
+      "flag_rate": 0.37409024745269287,
+      "recall": 0.7357512953367875,
+      "precision": 0.5525291828793775
+    },
+    {
+      "attribute": "gender",
+      "group": "Male",
+      "n": 722,
+      "churn_rate": 0.25069252077562326,
+      "flag_rate": 0.3670360110803324,
+      "recall": 0.7790055248618785,
+      "precision": 0.5320754716981132
+    },
+    {
+      "attribute": "SeniorCitizen",
+      "group": "0",
+      "n": 1187,
+      "churn_rate": 0.2325189553496209,
+      "flag_rate": 0.3226621735467565,
+      "recall": 0.7137681159420289,
+      "precision": 0.5143603133159269
+    },
+    {
+      "attribute": "SeniorCitizen",
+      "group": "1",
+      "n": 222,
+      "churn_rate": 0.44144144144144143,
+      "flag_rate": 0.6261261261261262,
+      "recall": 0.8775510204081632,
+      "precision": 0.6187050359712231
+    },
+    {
+      "attribute": "Partner",
+      "group": "No",
+      "n": 736,
+      "churn_rate": 0.33695652173913043,
+      "flag_rate": 0.4891304347826087,
+      "recall": 0.8185483870967742,
+      "precision": 0.5638888888888889
+    },
+    {
+      "attribute": "Partner",
+      "group": "Yes",
+      "n": 673,
+      "churn_rate": 0.18722139673105498,
+      "flag_rate": 0.24071322436849926,
+      "recall": 0.6349206349206349,
+      "precision": 0.49382716049382713
+    },
+    {
+      "attribute": "Dependents",
+      "group": "No",
+      "n": 978,
+      "churn_rate": 0.3098159509202454,
+      "flag_rate": 0.4550102249488753,
+      "recall": 0.8052805280528053,
+      "precision": 0.5483146067415731
+    },
+    {
+      "attribute": "Dependents",
+      "group": "Yes",
+      "n": 431,
+      "churn_rate": 0.16473317865429235,
+      "flag_rate": 0.17865429234338748,
+      "recall": 0.5492957746478874,
+      "precision": 0.5064935064935064
+    }
+  ],
+  "logreg_reference": {
+    "test_roc_auc": 0.8381952517502389,
+    "best_C": 4.6415888336127775,
+    "class_weight": "balanced",
+    "calibrated": false,
+    "input_columns": [
+      "SeniorCitizen",
+      "Partner",
+      "Dependents",
+      "tenure",
+      "PhoneService",
+      "MultipleLines",
+      "InternetService",
+      "OnlineSecurity",
+      "OnlineBackup",
+      "DeviceProtection",
+      "TechSupport",
+      "StreamingTV",
+      "StreamingMovies",
+      "Contract",
+      "PaperlessBilling",
+      "PaymentMethod",
+      "MonthlyCharges"
+    ]
+  },
+  "explainer_top3_overlap": {
+    "k": 3,
+    "n_rows": 300,
+    "mean_overlap": 0.9477777777777777,
+    "share_rows_with_ge_2_of_3": 1.0,
+    "definition": "mean over rows of |top3(5-pipeline averaged SHAP) & top3(single explainer SHAP)| / 3"
+  }
+}

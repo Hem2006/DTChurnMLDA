@@ -1,0 +1,299 @@
+{
+  "selected_model": "xgboost",
+  "calibration_method": "isotonic",
+  "seed": 42,
+  "threshold": 0.3400000000000001,
+  "threshold_source": "placeholder_f1_optimal_on_calibrated_oof",
+  "threshold_note": "PLACEHOLDER. No offer cost, customer value or success rate was supplied. F1 weighs a missed churner and a wasted offer equally; replace with offer_cost / (success_rate * customer_value) once real numbers exist.",
+  "input_columns": [
+    "SeniorCitizen",
+    "Partner",
+    "Dependents",
+    "tenure",
+    "PhoneService",
+    "MultipleLines",
+    "InternetService",
+    "OnlineSecurity",
+    "OnlineBackup",
+    "DeviceProtection",
+    "TechSupport",
+    "StreamingTV",
+    "StreamingMovies",
+    "Contract",
+    "PaperlessBilling",
+    "PaymentMethod",
+    "MonthlyCharges"
+  ],
+  "dropped_columns": [
+    "TotalCharges",
+    "gender"
+  ],
+  "feature_set_chosen": "D: drop TotalCharges + gender",
+  "totalcharges_mode": "drop",
+  "numeric_columns": [
+    "SeniorCitizen",
+    "tenure",
+    "MonthlyCharges"
+  ],
+  "categorical_columns": [
+    "Partner",
+    "Dependents",
+    "PhoneService",
+    "MultipleLines",
+    "InternetService",
+    "OnlineSecurity",
+    "OnlineBackup",
+    "DeviceProtection",
+    "TechSupport",
+    "StreamingTV",
+    "StreamingMovies",
+    "Contract",
+    "PaperlessBilling",
+    "PaymentMethod"
+  ],
+  "categorical_levels": {
+    "Partner": [
+      "No",
+      "Yes"
+    ],
+    "Dependents": [
+      "No",
+      "Yes"
+    ],
+    "PhoneService": [
+      "No",
+      "Yes"
+    ],
+    "MultipleLines": [
+      "No",
+      "No phone service",
+      "Yes"
+    ],
+    "InternetService": [
+      "DSL",
+      "Fiber optic",
+      "No"
+    ],
+    "OnlineSecurity": [
+      "No",
+      "No internet service",
+      "Yes"
+    ],
+    "OnlineBackup": [
+      "No",
+      "No internet service",
+      "Yes"
+    ],
+    "DeviceProtection": [
+      "No",
+      "No internet service",
+      "Yes"
+    ],
+    "TechSupport": [
+      "No",
+      "No internet service",
+      "Yes"
+    ],
+    "StreamingTV": [
+      "No",
+      "No internet service",
+      "Yes"
+    ],
+    "StreamingMovies": [
+      "No",
+      "No internet service",
+      "Yes"
+    ],
+    "Contract": [
+      "Month-to-month",
+      "One year",
+      "Two year"
+    ],
+    "PaperlessBilling": [
+      "No",
+      "Yes"
+    ],
+    "PaymentMethod": [
+      "Bank transfer (automatic)",
+      "Credit card (automatic)",
+      "Electronic check",
+      "Mailed check"
+    ]
+  },
+  "explainer_model": "xgboost",
+  "explainer_matches_served_model": true,
+  "versions": {
+    "python": "3.13.16",
+    "scikit-learn": "1.9.1",
+    "xgboost": "3.4.1",
+    "lightgbm": "4.7.0",
+    "shap": "0.53.0",
+    "pandas": "3.0.5",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "joblib": "1.6.0"
+  },
+  "test_metrics": {
+    "roc_auc": 0.8472099511741455,
+    "brier": 0.13497529627594052,
+    "precision": 0.5663900414937759,
+    "recall": 0.7299465240641712,
+    "f1": 0.6378504672897196,
+    "accuracy": 0.7799858055358411,
+    "flag_rate": 0.3420865862313698
+  },
+  "test_metrics_ci95": {
+    "roc_auc": [
+      0.8246558726708774,
+      0.8679555922261487
+    ],
+    "brier": [
+      0.12481381747902075,
+      0.14556075234388807
+    ],
+    "precision": [
+      0.5205161522562065,
+      0.6092732807468961
+    ],
+    "recall": [
+      0.6830300693203919,
+      0.7751375298978038
+    ],
+    "f1": [
+      0.597757699295988,
+      0.6743936922830602
+    ],
+    "accuracy": [
+      0.7579843860894251,
+      0.8005855216465577
+    ],
+    "flag_rate": [
+      0.31653655074520937,
+      0.3683463449254791
+    ]
+  },
+  "bootstrap_resamples": 2000,
+  "test_auc_baseline_contract_tenure": 0.7982588028623834,
+  "calibration_test": {
+    "brier_uncalibrated": 0.14243561029434204,
+    "brier_calibrated": 0.13497529627594052,
+    "brier_baseline_rate_only": 0.1949799619120813,
+    "ece_uncalibrated": 0.07169927878475849,
+    "ece_calibrated": 0.015251278827222008,
+    "mean_score_uncalibrated": 0.33713576197624207,
+    "mean_score_calibrated": 0.2668445764098916,
+    "observed_churn_rate_test": 0.2654364797728886
+  },
+  "ablation_mean_auc": {
+    "D: drop TotalCharges + gender": 0.8467691073016739,
+    "C: drop TotalCharges": 0.8464102606350848,
+    "B: TotalCharges blanks = 0": 0.8471444533883816,
+    "A: TotalCharges blanks = median (previous)": 0.8472279312352669
+  },
+  "nested_cv_auc": {
+    "logreg": {
+      "mean": 0.8436530842683195,
+      "sd": 0.018241969857913487
+    },
+    "random_forest": {
+      "mean": 0.8461805807702106,
+      "sd": 0.017105627037809462
+    },
+    "xgboost": {
+      "mean": 0.8495581029756643,
+      "sd": 0.017228539135253143
+    },
+    "lightgbm": {
+      "mean": 0.8501511765702604,
+      "sd": 0.017046867682320554
+    },
+    "baseline (Contract + tenure)": {
+      "mean": 0.7845790667206585,
+      "sd": 0.008692014145263653
+    }
+  },
+  "repeated_cv_auc": {
+    "baseline (Contract + tenure)": {
+      "mean": 0.7841509460558086,
+      "sd": 0.011467623868138082
+    },
+    "xgboost (tuned)": {
+      "mean": 0.8501660951475115,
+      "sd": 0.010843273666693725
+    }
+  },
+  "subgroups": [
+    {
+      "attribute": "gender",
+      "group": "Female",
+      "n": 687,
+      "churn_rate": 0.28093158660844253,
+      "flag_rate": 0.34934497816593885,
+      "recall": 0.7150259067357513,
+      "precision": 0.575
+    },
+    {
+      "attribute": "gender",
+      "group": "Male",
+      "n": 722,
+      "churn_rate": 0.25069252077562326,
+      "flag_rate": 0.33518005540166207,
+      "recall": 0.7458563535911602,
+      "precision": 0.5578512396694215
+    },
+    {
+      "attribute": "SeniorCitizen",
+      "group": "0",
+      "n": 1187,
+      "churn_rate": 0.2325189553496209,
+      "flag_rate": 0.2957034540859309,
+      "recall": 0.6920289855072463,
+      "precision": 0.5441595441595442
+    },
+    {
+      "attribute": "SeniorCitizen",
+      "group": "1",
+      "n": 222,
+      "churn_rate": 0.44144144144144143,
+      "flag_rate": 0.5900900900900901,
+      "recall": 0.8367346938775511,
+      "precision": 0.6259541984732825
+    },
+    {
+      "attribute": "Partner",
+      "group": "No",
+      "n": 736,
+      "churn_rate": 0.33695652173913043,
+      "flag_rate": 0.45652173913043476,
+      "recall": 0.7983870967741935,
+      "precision": 0.5892857142857143
+    },
+    {
+      "attribute": "Partner",
+      "group": "Yes",
+      "n": 673,
+      "churn_rate": 0.18722139673105498,
+      "flag_rate": 0.21693907875185736,
+      "recall": 0.5952380952380952,
+      "precision": 0.5136986301369864
+    },
+    {
+      "attribute": "Dependents",
+      "group": "No",
+      "n": 978,
+      "churn_rate": 0.3098159509202454,
+      "flag_rate": 0.42024539877300615,
+      "recall": 0.7788778877887789,
+      "precision": 0.5742092457420924
+    },
+    {
+      "attribute": "Dependents",
+      "group": "Yes",
+      "n": 431,
+      "churn_rate": 0.16473317865429235,
+      "flag_rate": 0.16473317865429235,
+      "recall": 0.5211267605633803,
+      "precision": 0.5211267605633803
+    }
+  ]
+}

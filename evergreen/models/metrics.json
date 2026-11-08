@@ -1,0 +1,247 @@
+{
+  "seed": 42,
+  "n_train": 5634,
+  "n_test": 1409,
+  "churn_rate_test": 0.2654364797728886,
+  "inputs": [
+    "SeniorCitizen",
+    "Partner",
+    "Dependents",
+    "tenure",
+    "PhoneService",
+    "MultipleLines",
+    "InternetService",
+    "OnlineSecurity",
+    "OnlineBackup",
+    "DeviceProtection",
+    "TechSupport",
+    "StreamingTV",
+    "StreamingMovies",
+    "Contract",
+    "PaperlessBilling",
+    "PaymentMethod",
+    "MonthlyCharges"
+  ],
+  "served": {
+    "model": "xgboost",
+    "calibration": "isotonic",
+    "oof_brier_train": {
+      "isotonic": 0.1331349071748243,
+      "sigmoid": 0.13446559058249344
+    }
+  },
+  "threshold": {
+    "threshold": 0.32500000000000007,
+    "source": "placeholder_f1_optimal_on_calibrated_oof",
+    "is_placeholder": true,
+    "note": "PLACEHOLDER. No offer cost, customer value or success rate is configured. F1 weighs a missed churner and a wasted offer equally, which is not a business claim. Set the three numbers in config/business.yaml.",
+    "inputs": {
+      "offer_cost": null,
+      "customer_value": null,
+      "success_rate": null
+    }
+  },
+  "test": {
+    "roc_auc": 0.8478674210132011,
+    "pr_auc": 0.6659795202578424,
+    "brier": 0.13476410556433252,
+    "precision": 0.5678496868475992,
+    "recall": 0.7272727272727273,
+    "f1": 0.6377491207502931,
+    "accuracy": 0.7806955287437899,
+    "flag_rate": 0.33995741660752304,
+    "top_decile_lift": 2.912371525012326,
+    "ece": 0.02419337773090129
+  },
+  "test_ci95": {
+    "roc_auc": [
+      0.825309590752027,
+      0.8688484377313139
+    ],
+    "pr_auc": [
+      0.6120954335080074,
+      0.714743712431364
+    ],
+    "brier": [
+      0.12457510191353573,
+      0.14532251428220788
+    ],
+    "precision": [
+      0.522170792635908,
+      0.610345916305446
+    ],
+    "recall": [
+      0.6805175127902401,
+      0.7735849056603774
+    ],
+    "f1": [
+      0.5965716825961325,
+      0.6750314063313582
+    ],
+    "accuracy": [
+      0.7579843860894251,
+      0.8019872249822569
+    ],
+    "flag_rate": [
+      0.3144073811213627,
+      0.3655251951738821
+    ],
+    "top_decile_lift": [
+      2.641457670381239,
+      3.218078776167276
+    ],
+    "ece": [
+      0.01954343871370975,
+      0.049351478125243174
+    ]
+  },
+  "bootstrap_resamples": 2000,
+  "ece_binning": "10 equal-width bins on [0, 1]; ECE = sum over bins of (n_bin / n) * |mean(y) - mean(p)|",
+  "brier_base_rate_predictor": 0.1949799619120813,
+  "calibration_comparison": {
+    "uncalibrated": {
+      "brier": 0.1347654014825821,
+      "log_loss": 0.41334402561187744,
+      "ece": 0.020378631601775037,
+      "mean_prediction": 0.2666850686073303,
+      "roc_auc": 0.8472874525304193
+    },
+    "platt": {
+      "brier": 0.13574714269194718,
+      "log_loss": 0.42221875318580954,
+      "ece": 0.03273191557723826,
+      "mean_prediction": 0.26666634800978345,
+      "roc_auc": 0.8477937947247411
+    },
+    "isotonic": {
+      "brier": 0.13476410556433252,
+      "log_loss": 0.4126283950784928,
+      "ece": 0.02419337773090129,
+      "mean_prediction": 0.2669369698602592,
+      "roc_auc": 0.8478674210132011
+    }
+  },
+  "families": {
+    "logreg": {
+      "test_roc_auc": 0.8381952517502389,
+      "test_roc_auc_ci95": [
+        0.8142547609419284,
+        0.8597110566423444
+      ],
+      "nested_cv_auc_mean": 0.8436530842683195,
+      "nested_cv_auc_sd": 0.018241969857913487,
+      "nested_cv_folds": [
+        0.8471596141728467,
+        0.8224415523564863,
+        0.8708719079702065,
+        0.8453278238249883,
+        0.8324645230170702
+      ],
+      "best_params": {
+        "C": 4.6415888336127775
+      }
+    },
+    "random_forest": {
+      "test_roc_auc": 0.8431566302410292,
+      "test_roc_auc_ci95": [
+        0.8204618359093906,
+        0.864028198302442
+      ],
+      "nested_cv_auc_mean": 0.8461805807702106,
+      "nested_cv_auc_sd": 0.017105627037809462,
+      "nested_cv_folds": [
+        0.8510150582456819,
+        0.8278238249882863,
+        0.8714151842696266,
+        0.8475594978430518,
+        0.8330893385044059
+      ],
+      "best_params": {
+        "n_estimators": 300,
+        "min_samples_leaf": 5,
+        "max_features": 0.5,
+        "max_depth": 6
+      }
+    },
+    "xgboost": {
+      "test_roc_auc": 0.8472874525304193,
+      "test_roc_auc_ci95": [
+        0.8245123159473641,
+        0.8681014969462619
+      ],
+      "nested_cv_auc_mean": 0.8501837121446341,
+      "nested_cv_auc_sd": 0.016802315487753624,
+      "nested_cv_folds": [
+        0.8573990596674907,
+        0.8312713069329326,
+        0.8738023686038809,
+        0.8509544698108025,
+        0.8374913557080635
+      ],
+      "best_params": {
+        "subsample": 0.6,
+        "reg_lambda": 3,
+        "n_estimators": 400,
+        "min_child_weight": 3,
+        "max_depth": 2,
+        "learning_rate": 0.02,
+        "gamma": 0.3,
+        "colsample_bytree": 1.0
+      }
+    },
+    "lightgbm": {
+      "test_roc_auc": 0.8461830582035185,
+      "test_roc_auc_ci95": [
+        0.823597776518896,
+        0.866813896461402
+      ],
+      "nested_cv_auc_mean": 0.849882304095782,
+      "nested_cv_auc_sd": 0.01638753275055377,
+      "nested_cv_folds": [
+        0.8560378394971968,
+        0.8309784628310148,
+        0.872429030746611,
+        0.8528125151471087,
+        0.8371536722569792
+      ],
+      "best_params": {
+        "subsample_freq": 1,
+        "subsample": 0.8,
+        "reg_lambda": 0,
+        "num_leaves": 4,
+        "n_estimators": 250,
+        "min_child_samples": 20,
+        "learning_rate": 0.03,
+        "colsample_bytree": 0.5
+      }
+    },
+    "baseline (Contract + tenure)": {
+      "test_roc_auc": 0.7982588028623834,
+      "test_roc_auc_ci95": [
+        0.7732633201471527,
+        0.8221443174745701
+      ],
+      "nested_cv_auc_mean": 0.7845790667206585,
+      "nested_cv_auc_sd": 0.008692014145263653,
+      "nested_cv_folds": [
+        0.7887301471895045,
+        0.7731306448225164,
+        0.7935388493044447,
+        0.7897581309679609,
+        0.7777375613188662
+      ]
+    }
+  },
+  "delong_served_vs_logreg": {
+    "auc_1": 0.847867421013201,
+    "auc_2": 0.838195251750239,
+    "diff": 0.009672169262961994,
+    "se": 0.003369453378309873,
+    "z": 2.8705455090206886,
+    "p_value": 0.004097642085688931
+  },
+  "auc_diff_served_minus_logreg_ci95": [
+    0.003273092941167796,
+    0.016245532048624788
+  ]
+}

@@ -1,0 +1,231 @@
+{
+  "name": "Evergreen - daily risk digest",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 1,
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "72b61f19-b19b-58cc-b239-672c754258f0",
+      "name": "Every morning",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        200
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "b53b4b8e-8537-525f-99c5-da7b65a64313",
+      "name": "Run it now (manual)",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ ($env.EVERGREEN_URL || 'http://host.docker.internal:8000') + '/automation/digest?top=10' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "={{ $env.EVERGREEN_API_KEY || '' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c5be35d9-bd15-56f1-aeba-10f0230b2e1e",
+      "name": "Ask Evergreen for the digest",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "eb0581d6-9823-5b74-88ba-0f726556697b",
+              "name": "text",
+              "value": "={{ '*Evergreen daily churn digest* (' + $json.interpretation + ')\\n' + $json.summary.flagged + ' of ' + $json.summary.n + ' customers are above the alert line' + ($json.threshold_is_placeholder ? ' (PLACEHOLDER line)' : '') + '.\\nOpen actions: ' + $json.actions.pending_approval + ' awaiting approval, ' + $json.actions.sent + ' with n8n.\\n\\nMost at risk:\\n' + $json.top_at_risk.map(c => '- ' + c.customer_ref + '  ' + (c.risk >= 0.995 ? '>99' : Math.round(c.risk * 100)) + '%  ' + c.contract + ', ' + c.tenure + ' mo' + (c.has_open_action ? '  (action open)' : '')).join('\\n') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0099e447-f529-5bd9-aebf-4be1eff72230",
+      "name": "Write the digest",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        480,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3fe2f474-322b-58d3-9b4f-472da5e59c99",
+              "leftValue": "={{ $env.SLACK_WEBHOOK_URL }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "30bebf17-bba0-5996-b8d1-48a88485ac9d",
+      "name": "Slack configured?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SLACK_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: $json.text }) }}",
+        "options": {}
+      },
+      "id": "f333c9a2-f79c-508c-ba97-ccab5f14b58c",
+      "name": "Post digest to Slack",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        120
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "61eb6d35-5c29-5729-83ea-1278ccb3445d",
+      "name": "Digest stays in the execution log",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        960,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Evergreen: daily risk digest\n\nPulls `/automation/digest` (customer refs only) every morning and posts it to Slack when `SLACK_WEBHOOK_URL` is set. Replace the Slack step with email, Teams or a Sheet as you like. Nothing is sent to customers.",
+        "height": 150,
+        "width": 420,
+        "color": 4
+      },
+      "id": "5589ba89-f476-56e0-b873-089237312cf8",
+      "name": "Note: what this is",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        20
+      ]
+    }
+  ],
+  "connections": {
+    "Every morning": {
+      "main": [
+        [
+          {
+            "node": "Ask Evergreen for the digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run it now (manual)": {
+      "main": [
+        [
+          {
+            "node": "Ask Evergreen for the digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ask Evergreen for the digest": {
+      "main": [
+        [
+          {
+            "node": "Write the digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write the digest": {
+      "main": [
+        [
+          {
+            "node": "Slack configured?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack configured?": {
+      "main": [
+        [
+          {
+            "node": "Post digest to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Digest stays in the execution log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "6309c279-6dc8-530a-ad32-026414605fee",
+  "tags": []
+}

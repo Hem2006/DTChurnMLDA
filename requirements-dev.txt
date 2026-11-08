@@ -1,0 +1,6 @@
+-r requirements.txt
+pytest==9.0.3
+httpx==0.28.1
+fairlearn==0.15.0
+streamlit==1.65.0
+mlflow==3.17.0

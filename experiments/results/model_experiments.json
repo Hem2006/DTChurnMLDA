@@ -1,0 +1,2033 @@
+{
+  "note": "Offline experiments; served artifacts read-only. Seed-42 80/20 split; bootstrap 2000 resamples (percentile CIs).",
+  "sanity": {
+    "served_auc_matches_meta": true,
+    "uncalibrated_brier_matches_meta": true,
+    "base_rate_test": 0.2654364797728886
+  },
+  "family_search": {
+    "random_forest": {
+      "best_cv_auc": 0.8469291275611178,
+      "best_params": {
+        "model__n_estimators": 300,
+        "model__min_samples_leaf": 5,
+        "model__max_features": 0.5,
+        "model__max_depth": 6
+      }
+    },
+    "lightgbm": {
+      "best_cv_auc": 0.8500597722859501,
+      "best_params": {
+        "model__subsample_freq": 1,
+        "model__subsample": 0.6,
+        "model__scale_pos_weight": 1.66,
+        "model__reg_lambda": 1,
+        "model__num_leaves": 4,
+        "model__n_estimators": 400,
+        "model__min_child_samples": 80,
+        "model__learning_rate": 0.02,
+        "model__colsample_bytree": 0.9
+      }
+    }
+  },
+  "ranking": {
+    "baseline_contract_tenure": {
+      "roc_auc": 0.7982588028623834,
+      "pr_auc": 0.5461834493955505,
+      "pr_auc_ci95": [
+        0.4944458346557891,
+        0.5978005463520578
+      ],
+      "lift_top_decile": 2.431429438313043,
+      "lift_top_decile_ci95": [
+        2.158389709358921,
+        2.7426858578324236
+      ]
+    },
+    "logreg_reference": {
+      "roc_auc": 0.8381952517502389,
+      "pr_auc": 0.6263704216331645,
+      "pr_auc_ci95": [
+        0.5710495632184388,
+        0.678463207620645
+      ],
+      "lift_top_decile": 2.752057496112565,
+      "lift_top_decile_ci95": [
+        2.450136081560284,
+        3.0729119109296357
+      ]
+    },
+    "random_forest": {
+      "roc_auc": 0.8431566302410292,
+      "pr_auc": 0.6488407094684707,
+      "pr_auc_ci95": [
+        0.5932824396028711,
+        0.6992853366847023
+      ],
+      "lift_top_decile": 2.725338491295938,
+      "lift_top_decile_ci95": [
+        2.4555882599206162,
+        3.0487068111374995
+      ]
+    },
+    "xgboost_served_calibrated": {
+      "roc_auc": 0.8481180087318195,
+      "pr_auc": 0.665328864795528,
+      "pr_auc_ci95": [
+        0.6116866747123176,
+        0.71339801667005
+      ],
+      "lift_top_decile": 2.912371525012326,
+      "lift_top_decile_ci95": [
+        2.6218602210136233,
+        3.2190039136221866
+      ]
+    },
+    "xgboost_uncalibrated": {
+      "roc_auc": 0.8471234079929731,
+      "pr_auc": 0.6608932149021309,
+      "pr_auc_ci95": [
+        0.6070482592344896,
+        0.7095693027998455
+      ],
+      "lift_top_decile": 2.912371525012326,
+      "lift_top_decile_ci95": [
+        2.5965567952458555,
+        3.1848960182114125
+      ]
+    },
+    "lightgbm": {
+      "roc_auc": 0.8481916350202795,
+      "pr_auc": 0.6640366125036125,
+      "pr_auc_ci95": [
+        0.6112621692297917,
+        0.7121167297932695
+      ],
+      "lift_top_decile": 2.912371525012326,
+      "lift_top_decile_ci95": [
+        2.6218602210136233,
+        3.209038716570931
+      ]
+    }
+  },
+  "delong_vs_served": {
+    "baseline_contract_tenure": {
+      "auc1": 0.8481180087318195,
+      "auc2": 0.7982588028623834,
+      "diff": 0.04985920586943615,
+      "se": 0.009485511565601758,
+      "z": 5.256353916666496,
+      "p_value": 1.4693939243763425e-07,
+      "ci95_diff": [
+        0.03126794467927307,
+        0.06845046705959923
+      ]
+    },
+    "logreg_reference": {
+      "auc1": 0.8481180087318195,
+      "auc2": 0.838195251750239,
+      "diff": 0.009922756981580516,
+      "se": 0.003439864595913334,
+      "z": 2.8846359224049283,
+      "p_value": 0.003918665560363314,
+      "ci95_diff": [
+        0.0031807462087158345,
+        0.016664767754445198
+      ]
+    },
+    "random_forest": {
+      "auc1": 0.8481180087318195,
+      "auc2": 0.8431566302410293,
+      "diff": 0.004961378490790258,
+      "se": 0.0026138796135669767,
+      "z": 1.8980898986467918,
+      "p_value": 0.05768424060017533,
+      "ci95_diff": [
+        -0.00016173145213492762,
+        0.010084488433715445
+      ]
+    },
+    "xgboost_uncalibrated": {
+      "auc1": 0.8481180087318195,
+      "auc2": 0.8471234079929733,
+      "diff": 0.000994600738846274,
+      "se": 0.0007515218777015292,
+      "z": 1.323448815473187,
+      "p_value": 0.1856861671810459,
+      "ci95_diff": [
+        -0.00047835508666112594,
+        0.002467556564353674
+      ]
+    },
+    "lightgbm": {
+      "auc1": 0.8481180087318195,
+      "auc2": 0.8481916350202795,
+      "diff": -7.362628845997143e-05,
+      "se": 0.000971031763443044,
+      "z": -0.07582273951462762,
+      "p_value": 0.9395601246827813,
+      "ci95_diff": [
+        -0.001976813587664854,
+        0.001829561010744911
+      ]
+    }
+  },
+  "calibration_ablation": {
+    "none": {
+      "oof_brier_train": 0.14011648297309875,
+      "f1_optimal_threshold_oof": 0.4400000000000001,
+      "test_brier": 0.1425197273492813,
+      "test_brier_ci95": [
+        0.13243505768477917,
+        0.1535193223506212
+      ],
+      "test_ece_quantile10": 0.07107982853516101,
+      "test_ece_quantile10_ci95": [
+        0.055960240092087526,
+        0.09267330086770856
+      ],
+      "test_ece_uniform10": 0.07240529755504525,
+      "test_ece_quantile15": 0.07174675999972058,
+      "test_mean_score": 0.3365163207054138,
+      "test_roc_auc": 0.8471234079929731,
+      "test_at_own_threshold": {
+        "roc_auc": 0.8471234079929731,
+        "brier": 0.1425197273492813,
+        "precision": 0.5426356589147286,
+        "recall": 0.7486631016042781,
+        "f1": 0.6292134831460674,
+        "accuracy": 0.765791341376863,
+        "flag_rate": 0.36621717530163234
+      }
+    },
+    "isotonic": {
+      "oof_brier_train": 0.13317627924149847,
+      "f1_optimal_threshold_oof": 0.31500000000000006,
+      "test_brier": 0.13472742604783333,
+      "test_brier_ci95": [
+        0.12456650228606597,
+        0.14514914496339587
+      ],
+      "test_ece_quantile10": 0.014111375828380008,
+      "test_ece_quantile10_ci95": [
+        0.016392941761164875,
+        0.044017381535783
+      ],
+      "test_ece_uniform10": 0.02404121100949487,
+      "test_ece_quantile15": 0.027060339601533298,
+      "test_mean_score": 0.2671045306254697,
+      "test_roc_auc": 0.8481180087318195,
+      "test_at_own_threshold": {
+        "roc_auc": 0.8481180087318195,
+        "brier": 0.13472742604783333,
+        "precision": 0.5421455938697318,
+        "recall": 0.7566844919786097,
+        "f1": 0.6316964285714286,
+        "accuracy": 0.765791341376863,
+        "flag_rate": 0.37047551454932576
+      }
+    },
+    "sigmoid": {
+      "oof_brier_train": 0.13398484211327388,
+      "f1_optimal_threshold_oof": 0.33000000000000007,
+      "test_brier": 0.1355452967876447,
+      "test_brier_ci95": [
+        0.12513013495517084,
+        0.14654848903497508
+      ],
+      "test_ece_quantile10": 0.027890528228762108,
+      "test_ece_quantile10_ci95": [
+        0.024702069084153733,
+        0.05370474755993934
+      ],
+      "test_ece_uniform10": 0.026030056798689822,
+      "test_ece_quantile15": 0.030996467429664137,
+      "test_mean_score": 0.2670181138203883,
+      "test_roc_auc": 0.8476581673512619,
+      "test_at_own_threshold": {
+        "roc_auc": 0.8476581673512619,
+        "brier": 0.1355452967876447,
+        "precision": 0.5714285714285714,
+        "recall": 0.7272727272727273,
+        "f1": 0.64,
+        "accuracy": 0.7828246983676366,
+        "flag_rate": 0.33782824698367636
+      }
+    },
+    "note": "ECE: equal-frequency (quantile) bins, 10 bins, |mean score - churn rate| weighted by bin share (as in train.py); equal-width-10 and quantile-15 shown as sensitivity. Threshold = F1-optimal on calibrated OOF train predictions (grid 0.020-0.950 step 0.005), the same rule that set the served placeholder."
+  },
+  "feature_ablation": {
+    "A: TotalCharges blanks = median": {
+      "cv_logreg_auc": 0.8447839501885601,
+      "cv_xgb_auc": 0.8493834551637084,
+      "cv_mean_auc": 0.8470837026761342,
+      "test_logreg_auc": 0.840858715027513,
+      "test_xgb_auc": 0.8487225193107546,
+      "test_mean_auc": 0.8447906171691337,
+      "n_inputs": 19
+    },
+    "B: TotalCharges blanks = 0": {
+      "cv_logreg_auc": 0.8448372763143851,
+      "cv_xgb_auc": 0.8493672755362353,
+      "cv_mean_auc": 0.8471022759253102,
+      "test_logreg_auc": 0.840977550440466,
+      "test_xgb_auc": 0.8486979772146013,
+      "test_mean_auc": 0.8448377638275336,
+      "n_inputs": 19
+    },
+    "C: drop TotalCharges": {
+      "cv_logreg_auc": 0.844195832342086,
+      "cv_xgb_auc": 0.848568820578933,
+      "cv_mean_auc": 0.8463823264605095,
+      "test_logreg_auc": 0.8390891007259292,
+      "test_xgb_auc": 0.8463251440233537,
+      "test_mean_auc": 0.8427071223746414,
+      "n_inputs": 18
+    },
+    "D: drop TotalCharges + gender (served)": {
+      "cv_logreg_auc": 0.8444956115120157,
+      "cv_xgb_auc": 0.8485584990545469,
+      "cv_mean_auc": 0.8465270552832813,
+      "test_logreg_auc": 0.8395437753494019,
+      "test_xgb_auc": 0.8467281510759772,
+      "test_mean_auc": 0.8431359632126896,
+      "n_inputs": 17
+    },
+    "E: drop gender only (TotalCharges median)": {
+      "cv_logreg_auc": 0.8450207291082823,
+      "cv_xgb_auc": 0.8493400454183216,
+      "cv_mean_auc": 0.8471803872633019,
+      "test_logreg_auc": 0.8411222196388437,
+      "test_xgb_auc": 0.8475070397065282,
+      "test_mean_auc": 0.844314629672686,
+      "n_inputs": 18
+    },
+    "F: D + drop SeniorCitizen, Partner, Dependents": {
+      "cv_logreg_auc": 0.8444881130521488,
+      "cv_xgb_auc": 0.8487025339553609,
+      "cv_mean_auc": 0.8465953235037549,
+      "test_logreg_auc": 0.8385478829212842,
+      "test_xgb_auc": 0.8462579761812498,
+      "test_mean_auc": 0.8424029295512669,
+      "n_inputs": 14
+    },
+    "G: D + drop MonthlyCharges": {
+      "cv_logreg_auc": 0.8445128136456429,
+      "cv_xgb_auc": 0.8497955058512556,
+      "cv_mean_auc": 0.8471541597484493,
+      "test_logreg_auc": 0.8394107313544654,
+      "test_xgb_auc": 0.8481451342065153,
+      "test_mean_auc": 0.8437779327804904,
+      "n_inputs": 16
+    }
+  },
+  "feature_ablation_protocol": "Fixed, untuned models: logistic regression (C=0.1, balanced) and XGBoost (250 trees, lr 0.03, depth 3, subsample 0.8, colsample 0.7); 5-fold stratified CV repeated twice (random_state 11) on the training set; mean CV AUC = average of the two models. Test effect: same fixed models refit on all of train, scored once on test.",
+  "profit_grid": {
+    "label": "HYPOTHETICAL values; sensitivity analysis only, not a business result",
+    "definition": "per test customer (n=1409): mean over customers of contact * (y*s*v - c) (realised, uses observed churn) and contact * (p*s*v - c) (expected, uses calibrated p). Assumes the offer only affects would-be churners.",
+    "rows": [
+      {
+        "c": 5,
+        "v": 200,
+        "s": 0.1,
+        "t_star": 0.25,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 0.30872959545777146,
+          "expected_profit_per_customer": 0.34209061250939304
+        },
+        "cost_threshold": {
+          "contacted": 611,
+          "realised_profit_per_customer": 2.1469127040454223,
+          "expected_profit_per_customer": 2.30052909938218
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 2.164655784244145,
+          "expected_profit_per_customer": 2.258973743494222
+        }
+      },
+      {
+        "c": 5,
+        "v": 200,
+        "s": 0.2,
+        "t_star": 0.125,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 5.617459190915543,
+          "expected_profit_per_customer": 5.684181225018786
+        },
+        "cost_threshold": {
+          "contacted": 809,
+          "realised_profit_per_customer": 6.980127750177431,
+          "expected_profit_per_customer": 7.046525331741534
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 6.181689141234918,
+          "expected_profit_per_customer": 6.370325059735073
+        }
+      },
+      {
+        "c": 5,
+        "v": 200,
+        "s": 0.3,
+        "t_star": 0.08333333333333333,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 10.926188786373315,
+          "expected_profit_per_customer": 11.02627183752818
+        },
+        "cost_threshold": {
+          "contacted": 942,
+          "realised_profit_per_customer": 12.072391767210787,
+          "expected_profit_per_customer": 12.132617079794956
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 10.198722498225692,
+          "expected_profit_per_customer": 10.481676375975924
+        }
+      },
+      {
+        "c": 5,
+        "v": 200,
+        "s": 0.5,
+        "t_star": 0.05,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 21.543647977288856,
+          "expected_profit_per_customer": 21.710453062546964
+        },
+        "cost_threshold": {
+          "contacted": 1036,
+          "realised_profit_per_customer": 22.512420156139108,
+          "expected_profit_per_customer": 22.55388253351913
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 18.23278921220724,
+          "expected_profit_per_customer": 18.704379008457625
+        }
+      },
+      {
+        "c": 5,
+        "v": 500,
+        "s": 0.1,
+        "t_star": 0.1,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 8.271823988644428,
+          "expected_profit_per_customer": 8.355226531273482
+        },
+        "cost_threshold": {
+          "contacted": 905,
+          "realised_profit_per_customer": 9.457061745919091,
+          "expected_profit_per_customer": 9.561431166696751
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 8.190205819730306,
+          "expected_profit_per_customer": 8.426000717855498
+        }
+      },
+      {
+        "c": 5,
+        "v": 500,
+        "s": 0.2,
+        "t_star": 0.05,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 21.543647977288856,
+          "expected_profit_per_customer": 21.710453062546964
+        },
+        "cost_threshold": {
+          "contacted": 1036,
+          "realised_profit_per_customer": 22.512420156139108,
+          "expected_profit_per_customer": 22.55388253351913
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 18.23278921220724,
+          "expected_profit_per_customer": 18.704379008457625
+        }
+      },
+      {
+        "c": 5,
+        "v": 500,
+        "s": 0.3,
+        "t_star": 0.03333333333333333,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 34.815471965933284,
+          "expected_profit_per_customer": 35.06567959382045
+        },
+        "cost_threshold": {
+          "contacted": 1094,
+          "realised_profit_per_customer": 35.72036905606814,
+          "expected_profit_per_customer": 35.718643122383725
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 28.275372604684172,
+          "expected_profit_per_customer": 28.982757299059752
+        }
+      },
+      {
+        "c": 5,
+        "v": 500,
+        "s": 0.5,
+        "t_star": 0.02,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 61.35911994322214,
+          "expected_profit_per_customer": 61.77613265636741
+        },
+        "cost_threshold": {
+          "contacted": 1158,
+          "realised_profit_per_customer": 61.89496096522356,
+          "expected_profit_per_customer": 62.225451716496174
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 48.36053938963804,
+          "expected_profit_per_customer": 49.539513880264
+        }
+      },
+      {
+        "c": 5,
+        "v": 800,
+        "s": 0.1,
+        "t_star": 0.0625,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 16.234918381831086,
+          "expected_profit_per_customer": 16.368362450037573
+        },
+        "cost_threshold": {
+          "contacted": 997,
+          "realised_profit_per_customer": 17.242725337118525,
+          "expected_profit_per_customer": 17.321164561087905
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 14.215755855216466,
+          "expected_profit_per_customer": 14.593027692216774
+        }
+      },
+      {
+        "c": 5,
+        "v": 800,
+        "s": 0.2,
+        "t_star": 0.03125,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 37.46983676366217,
+          "expected_profit_per_customer": 37.736724900075146
+        },
+        "cost_threshold": {
+          "contacted": 1130,
+          "realised_profit_per_customer": 38.23278921220724,
+          "expected_profit_per_customer": 38.36059732268769
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 30.28388928317956,
+          "expected_profit_per_customer": 31.038432957180177
+        }
+      },
+      {
+        "c": 5,
+        "v": 800,
+        "s": 0.3,
+        "t_star": 0.020833333333333332,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 58.70475514549326,
+          "expected_profit_per_customer": 59.10508735011272
+        },
+        "cost_threshold": {
+          "contacted": 1157,
+          "realised_profit_per_customer": 59.2583392476934,
+          "expected_profit_per_customer": 59.572105431499594
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 46.35202271114265,
+          "expected_profit_per_customer": 47.48383822214358
+        }
+      },
+      {
+        "c": 5,
+        "v": 800,
+        "s": 0.5,
+        "t_star": 0.0125,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 101.17459190915542,
+          "expected_profit_per_customer": 101.84181225018786
+        },
+        "cost_threshold": {
+          "contacted": 1261,
+          "realised_profit_per_customer": 101.1320085166785,
+          "expected_profit_per_customer": 102.17824262901982
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 78.48828956706885,
+          "expected_profit_per_customer": 80.37464875207039
+        }
+      },
+      {
+        "c": 5,
+        "v": 1500,
+        "s": 0.1,
+        "t_star": 0.03333333333333333,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 34.815471965933284,
+          "expected_profit_per_customer": 35.06567959382045
+        },
+        "cost_threshold": {
+          "contacted": 1094,
+          "realised_profit_per_customer": 35.72036905606814,
+          "expected_profit_per_customer": 35.718643122383725
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 28.275372604684172,
+          "expected_profit_per_customer": 28.982757299059752
+        }
+      },
+      {
+        "c": 5,
+        "v": 1500,
+        "s": 0.2,
+        "t_star": 0.016666666666666666,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 74.63094393186657,
+          "expected_profit_per_customer": 75.1313591876409
+        },
+        "cost_threshold": {
+          "contacted": 1238,
+          "realised_profit_per_customer": 74.81192334989355,
+          "expected_profit_per_customer": 75.52230595156942
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 58.40312278211498,
+          "expected_profit_per_customer": 59.81789217086613
+        }
+      },
+      {
+        "c": 5,
+        "v": 1500,
+        "s": 0.3,
+        "t_star": 0.011111111111111112,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 114.44641589779985,
+          "expected_profit_per_customer": 115.19703878146134
+        },
+        "cost_threshold": {
+          "contacted": 1263,
+          "realised_profit_per_customer": 114.32576295244854,
+          "expected_profit_per_customer": 115.51016482371226
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 88.53087295954577,
+          "expected_profit_per_customer": 90.65302704267252
+        }
+      },
+      {
+        "c": 5,
+        "v": 1500,
+        "s": 0.5,
+        "t_star": 0.006666666666666667,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 194.07735982966642,
+          "expected_profit_per_customer": 195.32839796910224
+        },
+        "cost_threshold": {
+          "contacted": 1287,
+          "realised_profit_per_customer": 193.44570617459192,
+          "expected_profit_per_customer": 195.53879430869196
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 148.78637331440737,
+          "expected_profit_per_customer": 152.32329678628528
+        }
+      },
+      {
+        "c": 10,
+        "v": 200,
+        "s": 0.1,
+        "t_star": 0.5,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": -4.691270404542228,
+          "expected_profit_per_customer": -4.657909387490607
+        },
+        "cost_threshold": {
+          "contacted": 291,
+          "realised_profit_per_customer": 0.7452093683463449,
+          "expected_profit_per_customer": 0.7338106747296281
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 0.31227821149751595,
+          "expected_profit_per_customer": 0.4065961707475933
+        }
+      },
+      {
+        "c": 10,
+        "v": 200,
+        "s": 0.2,
+        "t_star": 0.25,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 0.6174591909155429,
+          "expected_profit_per_customer": 0.6841812250187861
+        },
+        "cost_threshold": {
+          "contacted": 611,
+          "realised_profit_per_customer": 4.293825408090845,
+          "expected_profit_per_customer": 4.60105819876436
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 4.32931156848829,
+          "expected_profit_per_customer": 4.517947486988444
+        }
+      },
+      {
+        "c": 10,
+        "v": 200,
+        "s": 0.3,
+        "t_star": 0.16666666666666666,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 5.926188786373315,
+          "expected_profit_per_customer": 6.026271837528179
+        },
+        "cost_threshold": {
+          "contacted": 708,
+          "realised_profit_per_customer": 8.857345635202272,
+          "expected_profit_per_customer": 9.223835520282377
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 8.346344925479062,
+          "expected_profit_per_customer": 8.629298803229295
+        }
+      },
+      {
+        "c": 10,
+        "v": 200,
+        "s": 0.5,
+        "t_star": 0.1,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 16.543647977288856,
+          "expected_profit_per_customer": 16.710453062546964
+        },
+        "cost_threshold": {
+          "contacted": 905,
+          "realised_profit_per_customer": 18.914123491838183,
+          "expected_profit_per_customer": 19.122862333393503
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 16.38041163946061,
+          "expected_profit_per_customer": 16.852001435710996
+        }
+      },
+      {
+        "c": 10,
+        "v": 500,
+        "s": 0.1,
+        "t_star": 0.2,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 3.2718239886444285,
+          "expected_profit_per_customer": 3.3552265312734826
+        },
+        "cost_threshold": {
+          "contacted": 660,
+          "realised_profit_per_customer": 6.45848119233499,
+          "expected_profit_per_customer": 6.884173640678587
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 6.337828246983676,
+          "expected_profit_per_customer": 6.573623145108869
+        }
+      },
+      {
+        "c": 10,
+        "v": 500,
+        "s": 0.2,
+        "t_star": 0.1,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 16.543647977288856,
+          "expected_profit_per_customer": 16.710453062546964
+        },
+        "cost_threshold": {
+          "contacted": 905,
+          "realised_profit_per_customer": 18.914123491838183,
+          "expected_profit_per_customer": 19.122862333393503
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 16.38041163946061,
+          "expected_profit_per_customer": 16.852001435710996
+        }
+      },
+      {
+        "c": 10,
+        "v": 500,
+        "s": 0.3,
+        "t_star": 0.06666666666666667,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 29.815471965933288,
+          "expected_profit_per_customer": 30.065679593820448
+        },
+        "cost_threshold": {
+          "contacted": 978,
+          "realised_profit_per_customer": 31.70333569907736,
+          "expected_profit_per_customer": 32.04075473176304
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 26.422995031937543,
+          "expected_profit_per_customer": 27.130379726313123
+        }
+      },
+      {
+        "c": 10,
+        "v": 500,
+        "s": 0.5,
+        "t_star": 0.04,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 56.35911994322214,
+          "expected_profit_per_customer": 56.77613265636741
+        },
+        "cost_threshold": {
+          "contacted": 1072,
+          "realised_profit_per_customer": 58.21859474804826,
+          "expected_profit_per_customer": 58.249072182336604
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 46.50816181689141,
+          "expected_profit_per_customer": 47.68713630751738
+        }
+      },
+      {
+        "c": 10,
+        "v": 800,
+        "s": 0.1,
+        "t_star": 0.125,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 11.234918381831086,
+          "expected_profit_per_customer": 11.368362450037573
+        },
+        "cost_threshold": {
+          "contacted": 809,
+          "realised_profit_per_customer": 13.960255500354862,
+          "expected_profit_per_customer": 14.093050663483067
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 12.363378282469837,
+          "expected_profit_per_customer": 12.740650119470146
+        }
+      },
+      {
+        "c": 10,
+        "v": 800,
+        "s": 0.2,
+        "t_star": 0.0625,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 32.46983676366217,
+          "expected_profit_per_customer": 32.736724900075146
+        },
+        "cost_threshold": {
+          "contacted": 997,
+          "realised_profit_per_customer": 34.48545067423705,
+          "expected_profit_per_customer": 34.64232912217581
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 28.431511710432932,
+          "expected_profit_per_customer": 29.186055384433548
+        }
+      },
+      {
+        "c": 10,
+        "v": 800,
+        "s": 0.3,
+        "t_star": 0.041666666666666664,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 53.70475514549326,
+          "expected_profit_per_customer": 54.10508735011272
+        },
+        "cost_threshold": {
+          "contacted": 1059,
+          "realised_profit_per_customer": 55.50745209368346,
+          "expected_profit_per_customer": 55.61690305823802
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 44.499645138396026,
+          "expected_profit_per_customer": 45.63146064939695
+        }
+      },
+      {
+        "c": 10,
+        "v": 800,
+        "s": 0.5,
+        "t_star": 0.025,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 96.17459190915542,
+          "expected_profit_per_customer": 96.84181225018786
+        },
+        "cost_threshold": {
+          "contacted": 1148,
+          "realised_profit_per_customer": 97.45919091554293,
+          "expected_profit_per_customer": 97.92094053815578
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 76.63591199432221,
+          "expected_profit_per_customer": 78.52227117932375
+        }
+      },
+      {
+        "c": 10,
+        "v": 1500,
+        "s": 0.1,
+        "t_star": 0.06666666666666667,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 29.815471965933288,
+          "expected_profit_per_customer": 30.065679593820448
+        },
+        "cost_threshold": {
+          "contacted": 978,
+          "realised_profit_per_customer": 31.70333569907736,
+          "expected_profit_per_customer": 32.04075473176304
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 26.422995031937543,
+          "expected_profit_per_customer": 27.130379726313123
+        }
+      },
+      {
+        "c": 10,
+        "v": 1500,
+        "s": 0.2,
+        "t_star": 0.03333333333333333,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 69.63094393186657,
+          "expected_profit_per_customer": 70.1313591876409
+        },
+        "cost_threshold": {
+          "contacted": 1094,
+          "realised_profit_per_customer": 71.44073811213627,
+          "expected_profit_per_customer": 71.43728624476745
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 56.550745209368344,
+          "expected_profit_per_customer": 57.965514598119505
+        }
+      },
+      {
+        "c": 10,
+        "v": 1500,
+        "s": 0.3,
+        "t_star": 0.022222222222222223,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 109.44641589779985,
+          "expected_profit_per_customer": 110.19703878146134
+        },
+        "cost_threshold": {
+          "contacted": 1156,
+          "realised_profit_per_customer": 110.60326472675656,
+          "expected_profit_per_customer": 111.18458131112084
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 86.67849538679914,
+          "expected_profit_per_customer": 88.80064946992589
+        }
+      },
+      {
+        "c": 10,
+        "v": 1500,
+        "s": 0.5,
+        "t_star": 0.013333333333333334,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 189.07735982966642,
+          "expected_profit_per_customer": 190.32839796910224
+        },
+        "cost_threshold": {
+          "contacted": 1256,
+          "realised_profit_per_customer": 189.0986515259049,
+          "expected_profit_per_customer": 191.02548488602835
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 146.93399574166077,
+          "expected_profit_per_customer": 150.47091921353865
+        }
+      },
+      {
+        "c": 20,
+        "v": 200,
+        "s": 0.1,
+        "t_star": 1.0,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": -14.691270404542228,
+          "expected_profit_per_customer": -14.657909387490607
+        },
+        "cost_threshold": {
+          "contacted": 3,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": -3.3924769339957415,
+          "expected_profit_per_customer": -3.2981589747456646
+        }
+      },
+      {
+        "c": 20,
+        "v": 200,
+        "s": 0.2,
+        "t_star": 0.5,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": -9.382540809084457,
+          "expected_profit_per_customer": -9.315818774981214
+        },
+        "cost_threshold": {
+          "contacted": 291,
+          "realised_profit_per_customer": 1.4904187366926898,
+          "expected_profit_per_customer": 1.4676213494592563
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 0.6245564229950319,
+          "expected_profit_per_customer": 0.8131923414951866
+        }
+      },
+      {
+        "c": 20,
+        "v": 200,
+        "s": 0.3,
+        "t_star": 0.3333333333333333,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": -4.073811213626685,
+          "expected_profit_per_customer": -3.973728162471821
+        },
+        "cost_threshold": {
+          "contacted": 486,
+          "realised_profit_per_customer": 4.811923349893542,
+          "expected_profit_per_customer": 4.937345332842164
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 4.6415897799858055,
+          "expected_profit_per_customer": 4.924543657736037
+        }
+      },
+      {
+        "c": 20,
+        "v": 200,
+        "s": 0.5,
+        "t_star": 0.2,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 6.543647977288857,
+          "expected_profit_per_customer": 6.710453062546965
+        },
+        "cost_threshold": {
+          "contacted": 660,
+          "realised_profit_per_customer": 12.91696238466998,
+          "expected_profit_per_customer": 13.768347281357174
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 12.675656493967352,
+          "expected_profit_per_customer": 13.147246290217739
+        }
+      },
+      {
+        "c": 20,
+        "v": 500,
+        "s": 0.1,
+        "t_star": 0.4,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": -6.728176011355571,
+          "expected_profit_per_customer": -6.644773468726518
+        },
+        "cost_threshold": {
+          "contacted": 407,
+          "realised_profit_per_customer": 2.9524485450674236,
+          "expected_profit_per_customer": 3.0455204425677076
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 2.6330731014904187,
+          "expected_profit_per_customer": 2.868867999615612
+        }
+      },
+      {
+        "c": 20,
+        "v": 500,
+        "s": 0.2,
+        "t_star": 0.2,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 6.543647977288857,
+          "expected_profit_per_customer": 6.710453062546965
+        },
+        "cost_threshold": {
+          "contacted": 660,
+          "realised_profit_per_customer": 12.91696238466998,
+          "expected_profit_per_customer": 13.768347281357174
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 12.675656493967352,
+          "expected_profit_per_customer": 13.147246290217739
+        }
+      },
+      {
+        "c": 20,
+        "v": 500,
+        "s": 0.3,
+        "t_star": 0.13333333333333333,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 19.815471965933288,
+          "expected_profit_per_customer": 20.065679593820448
+        },
+        "cost_threshold": {
+          "contacted": 794,
+          "realised_profit_per_customer": 25.351312987934705,
+          "expected_profit_per_customer": 25.71725849572482
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 22.718239886444287,
+          "expected_profit_per_customer": 23.425624580819864
+        }
+      },
+      {
+        "c": 20,
+        "v": 500,
+        "s": 0.5,
+        "t_star": 0.08,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 46.35911994322214,
+          "expected_profit_per_customer": 46.77613265636741
+        },
+        "cost_threshold": {
+          "contacted": 958,
+          "realised_profit_per_customer": 50.63165365507452,
+          "expected_profit_per_customer": 51.111462071109656
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 42.80340667139816,
+          "expected_profit_per_customer": 43.98238116202412
+        }
+      },
+      {
+        "c": 20,
+        "v": 800,
+        "s": 0.1,
+        "t_star": 0.25,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 1.2349183818310858,
+          "expected_profit_per_customer": 1.3683624500375722
+        },
+        "cost_threshold": {
+          "contacted": 611,
+          "realised_profit_per_customer": 8.58765081618169,
+          "expected_profit_per_customer": 9.20211639752872
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 8.65862313697658,
+          "expected_profit_per_customer": 9.035894973976887
+        }
+      },
+      {
+        "c": 20,
+        "v": 800,
+        "s": 0.2,
+        "t_star": 0.125,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 22.469836763662173,
+          "expected_profit_per_customer": 22.736724900075146
+        },
+        "cost_threshold": {
+          "contacted": 809,
+          "realised_profit_per_customer": 27.920511000709723,
+          "expected_profit_per_customer": 28.186101326966135
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 24.726756564939674,
+          "expected_profit_per_customer": 25.481300238940293
+        }
+      },
+      {
+        "c": 20,
+        "v": 800,
+        "s": 0.3,
+        "t_star": 0.08333333333333333,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 43.70475514549326,
+          "expected_profit_per_customer": 44.10508735011272
+        },
+        "cost_threshold": {
+          "contacted": 942,
+          "realised_profit_per_customer": 48.28956706884315,
+          "expected_profit_per_customer": 48.530468319179825
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 40.79488999290277,
+          "expected_profit_per_customer": 41.9267055039037
+        }
+      },
+      {
+        "c": 20,
+        "v": 800,
+        "s": 0.5,
+        "t_star": 0.05,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 86.17459190915542,
+          "expected_profit_per_customer": 86.84181225018786
+        },
+        "cost_threshold": {
+          "contacted": 1036,
+          "realised_profit_per_customer": 90.04968062455643,
+          "expected_profit_per_customer": 90.21553013407652
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 72.93115684882896,
+          "expected_profit_per_customer": 74.8175160338305
+        }
+      },
+      {
+        "c": 20,
+        "v": 1500,
+        "s": 0.1,
+        "t_star": 0.13333333333333333,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 19.815471965933288,
+          "expected_profit_per_customer": 20.065679593820448
+        },
+        "cost_threshold": {
+          "contacted": 794,
+          "realised_profit_per_customer": 25.351312987934705,
+          "expected_profit_per_customer": 25.71725849572482
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 22.718239886444287,
+          "expected_profit_per_customer": 23.425624580819864
+        }
+      },
+      {
+        "c": 20,
+        "v": 1500,
+        "s": 0.2,
+        "t_star": 0.06666666666666667,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 59.630943931866575,
+          "expected_profit_per_customer": 60.131359187640896
+        },
+        "cost_threshold": {
+          "contacted": 978,
+          "realised_profit_per_customer": 63.40667139815472,
+          "expected_profit_per_customer": 64.08150946352607
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 52.845990063875085,
+          "expected_profit_per_customer": 54.260759452626246
+        }
+      },
+      {
+        "c": 20,
+        "v": 1500,
+        "s": 0.3,
+        "t_star": 0.044444444444444446,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 99.44641589779985,
+          "expected_profit_per_customer": 100.19703878146134
+        },
+        "cost_threshold": {
+          "contacted": 1056,
+          "realised_profit_per_customer": 103.17955997161107,
+          "expected_profit_per_customer": 103.34338618688301
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 82.97374024130589,
+          "expected_profit_per_customer": 85.09589432443262
+        }
+      },
+      {
+        "c": 20,
+        "v": 1500,
+        "s": 0.5,
+        "t_star": 0.02666666666666667,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 179.07735982966642,
+          "expected_profit_per_customer": 180.32839796910224
+        },
+        "cost_threshold": {
+          "contacted": 1138,
+          "realised_profit_per_customer": 181.8594748048261,
+          "expected_profit_per_customer": 182.58916062675019
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 143.2292405961675,
+          "expected_profit_per_customer": 146.76616406804538
+        }
+      },
+      {
+        "c": 50,
+        "v": 200,
+        "s": 0.1,
+        "t_star": 2.5,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": -44.69127040454223,
+          "expected_profit_per_customer": -44.657909387490605
+        },
+        "cost_threshold": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": -14.506742370475514,
+          "expected_profit_per_customer": -14.412424411225437
+        }
+      },
+      {
+        "c": 50,
+        "v": 200,
+        "s": 0.2,
+        "t_star": 1.25,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": -39.38254080908446,
+          "expected_profit_per_customer": -39.31581877498122
+        },
+        "cost_threshold": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": -10.489709013484742,
+          "expected_profit_per_customer": -10.301073094984586
+        }
+      },
+      {
+        "c": 50,
+        "v": 200,
+        "s": 0.3,
+        "t_star": 0.8333333333333334,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": -34.07381121362668,
+          "expected_profit_per_customer": -33.97372816247182
+        },
+        "cost_threshold": {
+          "contacted": 62,
+          "realised_profit_per_customer": 0.014194464158977998,
+          "expected_profit_per_customer": 0.15764253895869892
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": -6.472675656493967,
+          "expected_profit_per_customer": -6.189721778743736
+        }
+      },
+      {
+        "c": 50,
+        "v": 200,
+        "s": 0.5,
+        "t_star": 0.5,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": -23.456352022711144,
+          "expected_profit_per_customer": -23.289546937453036
+        },
+        "cost_threshold": {
+          "contacted": 291,
+          "realised_profit_per_customer": 3.7260468417317245,
+          "expected_profit_per_customer": 3.6690533736481408
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 1.5613910574875798,
+          "expected_profit_per_customer": 2.032980853737966
+        }
+      },
+      {
+        "c": 50,
+        "v": 500,
+        "s": 0.1,
+        "t_star": 1.0,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": -36.72817601135557,
+          "expected_profit_per_customer": -36.64477346872652
+        },
+        "cost_threshold": {
+          "contacted": 3,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": -8.481192334989354,
+          "expected_profit_per_customer": -8.245397436864161
+        }
+      },
+      {
+        "c": 50,
+        "v": 500,
+        "s": 0.2,
+        "t_star": 0.5,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": -23.456352022711144,
+          "expected_profit_per_customer": -23.289546937453036
+        },
+        "cost_threshold": {
+          "contacted": 291,
+          "realised_profit_per_customer": 3.7260468417317245,
+          "expected_profit_per_customer": 3.669053373648141
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 1.5613910574875798,
+          "expected_profit_per_customer": 2.0329808537379668
+        }
+      },
+      {
+        "c": 50,
+        "v": 500,
+        "s": 0.3,
+        "t_star": 0.3333333333333333,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": -10.184528034066714,
+          "expected_profit_per_customer": -9.934320406179552
+        },
+        "cost_threshold": {
+          "contacted": 486,
+          "realised_profit_per_customer": 12.029808374733854,
+          "expected_profit_per_customer": 12.34336333210541
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 11.603974449964515,
+          "expected_profit_per_customer": 12.311359144340093
+        }
+      },
+      {
+        "c": 50,
+        "v": 500,
+        "s": 0.5,
+        "t_star": 0.2,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 16.359119943222144,
+          "expected_profit_per_customer": 16.776132656367412
+        },
+        "cost_threshold": {
+          "contacted": 660,
+          "realised_profit_per_customer": 32.292405961674945,
+          "expected_profit_per_customer": 34.420868203392935
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 31.68914123491838,
+          "expected_profit_per_customer": 32.86811572554435
+        }
+      },
+      {
+        "c": 50,
+        "v": 800,
+        "s": 0.1,
+        "t_star": 0.625,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": -28.765081618168914,
+          "expected_profit_per_customer": -28.631637549962427
+        },
+        "cost_threshold": {
+          "contacted": 142,
+          "realised_profit_per_customer": 1.20652945351313,
+          "expected_profit_per_customer": 1.3271906516330305
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": -2.455642299503194,
+          "expected_profit_per_customer": -2.0783704625028845
+        }
+      },
+      {
+        "c": 50,
+        "v": 800,
+        "s": 0.2,
+        "t_star": 0.3125,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": -7.530163236337828,
+          "expected_profit_per_customer": -7.263275099924856
+        },
+        "cost_threshold": {
+          "contacted": 526,
+          "realised_profit_per_customer": 13.47054648687012,
+          "expected_profit_per_customer": 14.367223227252513
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 13.6124911284599,
+          "expected_profit_per_customer": 14.367034802460518
+        }
+      },
+      {
+        "c": 50,
+        "v": 800,
+        "s": 0.3,
+        "t_star": 0.20833333333333334,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 13.704755145493257,
+          "expected_profit_per_customer": 14.105087350112717
+        },
+        "cost_threshold": {
+          "contacted": 654,
+          "realised_profit_per_customer": 30.27679205110007,
+          "expected_profit_per_customer": 32.112188536872075
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 29.680624556422995,
+          "expected_profit_per_customer": 30.81244006742392
+        }
+      },
+      {
+        "c": 50,
+        "v": 800,
+        "s": 0.5,
+        "t_star": 0.125,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 56.17459190915543,
+          "expected_profit_per_customer": 56.84181225018786
+        },
+        "cost_threshold": {
+          "contacted": 809,
+          "realised_profit_per_customer": 69.80127750177431,
+          "expected_profit_per_customer": 70.46525331741533
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 61.816891412349186,
+          "expected_profit_per_customer": 63.703250597350724
+        }
+      },
+      {
+        "c": 50,
+        "v": 1500,
+        "s": 0.1,
+        "t_star": 0.3333333333333333,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": -10.184528034066714,
+          "expected_profit_per_customer": -9.934320406179552
+        },
+        "cost_threshold": {
+          "contacted": 486,
+          "realised_profit_per_customer": 12.029808374733854,
+          "expected_profit_per_customer": 12.34336333210541
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 11.603974449964515,
+          "expected_profit_per_customer": 12.311359144340093
+        }
+      },
+      {
+        "c": 50,
+        "v": 1500,
+        "s": 0.2,
+        "t_star": 0.16666666666666666,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 29.63094393186657,
+          "expected_profit_per_customer": 30.131359187640896
+        },
+        "cost_threshold": {
+          "contacted": 708,
+          "realised_profit_per_customer": 44.28672817601136,
+          "expected_profit_per_customer": 46.119177601411884
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 41.731724627395316,
+          "expected_profit_per_customer": 43.14649401614648
+        }
+      },
+      {
+        "c": 50,
+        "v": 1500,
+        "s": 0.3,
+        "t_star": 0.1111111111111111,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 69.44641589779985,
+          "expected_profit_per_customer": 70.19703878146134
+        },
+        "cost_threshold": {
+          "contacted": 833,
+          "realised_profit_per_customer": 82.22143364088005,
+          "expected_profit_per_customer": 82.90813946317832
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 71.85947480482612,
+          "expected_profit_per_customer": 73.98162888795285
+        }
+      },
+      {
+        "c": 50,
+        "v": 1500,
+        "s": 0.5,
+        "t_star": 0.06666666666666667,
+        "no_action": {
+          "contacted": 0,
+          "realised_profit_per_customer": 0.0,
+          "expected_profit_per_customer": 0.0
+        },
+        "flag_everyone": {
+          "contacted": 1409,
+          "realised_profit_per_customer": 149.07735982966642,
+          "expected_profit_per_customer": 150.32839796910224
+        },
+        "cost_threshold": {
+          "contacted": 978,
+          "realised_profit_per_customer": 158.5166784953868,
+          "expected_profit_per_customer": 160.20377365881518
+        },
+        "placeholder_0.315": {
+          "contacted": 522,
+          "realised_profit_per_customer": 132.11497515968773,
+          "expected_profit_per_customer": 135.65189863156562
+        }
+      }
+    ],
+    "summary": {
+      "cells": 64,
+      "cost_threshold_best_or_tied_share": 0.890625,
+      "cost_threshold_beats_placeholder_share": 0.9375,
+      "cost_threshold_ge_flag_everyone_share": 0.953125,
+      "cost_threshold_ge_no_action_share": 1.0
+    }
+  },
+  "uplift_simulation_config": {
+    "seed": 42,
+    "treatment_probability": 0.5,
+    "retention_probability_by_contract": {
+      "Month-to-month": 0.3,
+      "One year": 0.1,
+      "Two year": 0.0
+    }
+  },
+  "uplift_simulation_evaluation": {
+    "label": "SIMULATED",
+    "n_train": 5634,
+    "n_treated": 2879,
+    "n_control": 2755,
+    "sim_churn_rate_treated_train": 0.20041681139284473,
+    "sim_churn_rate_control_train": 0.2613430127041742,
+    "corr_estimated_vs_assumed_uplift_test": 0.7949461194012075,
+    "mean_estimated_uplift_test": 0.06757659465074539,
+    "mean_assumed_uplift_test": 0.0733676252022486,
+    "sim_test_treated_share": 0.49538679914833217
+  },
+  "inner_loop": {
+    "outer": "5-fold stratified (random_state 123)",
+    "inner": "3-fold stratified (random_state 7)",
+    "logreg": "grid over C = logspace(-3, 1, 13), balanced class weights (13 candidates)",
+    "random_forest": "randomised search, 8 iterations",
+    "xgboost": "randomised search, 25 iterations",
+    "lightgbm": "randomised search, 15 iterations",
+    "final_fit": "5-fold stratified search (random_state 42) on all of train",
+    "scoring": "ROC AUC"
+  }
+}

@@ -1,0 +1,87 @@
+# Service-incident engine: SIMULATION assumptions. Read app/incidents.py first.
+#
+# Every number below is an arbitrary ASSUMPTION used to turn a customer's bad service experiences into a frustration score and to
+# split customers into four segments. They are NOT findings, NOT measured from the Telco data (it has no service-event data), and
+# NOT business numbers (offer cost, customer value, success rate and the guardrail limits still live in config.yaml / guardrails.yaml).
+# Change them freely; the engine labels every output SIMULATED.
+
+# kind -> how strongly one event of that kind frustrates a customer (weight), and the internal task it triggers (null = none).
+event_kinds:
+  outage:             {weight: 1.0, task: engineering_check}
+  slow_service:       {weight: 0.4, task: line_quality_check}
+  dropped_call:       {weight: 0.5, task: line_quality_check}
+  support_call:       {weight: 0.3, task: null}                 # the customer had to call us: a mild signal by itself
+  support_unanswered: {weight: 0.9, task: priority_callback}    # a promised answer / callback never came
+  complaint:          {weight: 0.8, task: priority_callback}
+  bill_dispute:       {weight: 0.6, task: billing_review}
+  repeat_visit:       {weight: 0.7, task: engineering_check}    # a technician had to come back
+
+severity_scale: 3          # event strength is multiplied by severity / severity_scale (severity is 1..5)
+
+modifiers:
+  late_night: {start_hour: 22, end_hour: 6, multiplier: 1.5}    # event happened in these (customer-local) hours
+  work_impact: 1.5                                              # the customer said it affected their work
+  unresolved: 1.5                                               # still open
+
+repeat_contact:            # the customer keeps having to come back to us
+  kinds: [support_call, support_unanswered, complaint, dropped_call]
+  window_days: 7
+  min_events: 3
+  multiplier: 1.3
+
+half_life_days: 14         # an event's influence halves every 14 days
+score_scale: 0.4           # frustration = 1 - exp(-score_scale * sum of event strengths)
+
+levels: {annoyed: 0.35, angry: 0.65}   # frustration at or above these values
+trigger_level: angry                   # the self-healing run starts when a customer reaches this level
+
+segmentation:
+  uplift_margin: 0.02      # SIMULATED uplift beyond +/- this counts as a real push (else "no effect")
+
+# Optional. If set (e.g. 0.2), the churn probability used for the segment is min(1, p + bump * frustration). The served model never
+# saw service events; leaving this null keeps the pure model score. No default on purpose.
+frustration_risk_bump: null
+
+# Canned storylines for the simulator. day = days before "now", hour = hour of day (customer-local).
+storylines:
+  late_night_outage:
+    description: Service dies late at night during the customer's work; support never calls back.
+    events:
+      - {day: 3, hour: 23, kind: outage, severity: 4, work_impact: true, note: Internet down at 11pm, missed an overnight deadline}
+      - {day: 3, hour: 23, kind: dropped_call, severity: 3, note: Calls to the support line cut off}
+      - {day: 2, hour: 9, kind: support_call, severity: 3, note: Called support about the outage}
+      - {day: 1, hour: 15, kind: support_unanswered, severity: 4, note: Promised callback never came}
+      - {day: 1, hour: 18, kind: support_call, severity: 3, note: Called again}
+      - {day: 0, hour: 8, kind: complaint, severity: 4, work_impact: true, note: Formal complaint about the outage and the silence}
+  ignored_by_support:
+    description: Repeated contacts, nobody gets back to the customer.
+    events:
+      - {day: 6, hour: 11, kind: support_call, severity: 2, note: Asked about a billing line}
+      - {day: 5, hour: 14, kind: support_unanswered, severity: 3, note: Ticket left without an answer}
+      - {day: 3, hour: 10, kind: support_call, severity: 3, note: Chased the ticket}
+      - {day: 2, hour: 16, kind: support_unanswered, severity: 4, note: Callback missed}
+      - {day: 0, hour: 9, kind: complaint, severity: 3, note: Complaint about being ignored}
+  flaky_line:
+    description: A line that keeps dropping, mild but constant.
+    events:
+      - {day: 9, hour: 20, kind: dropped_call, severity: 2}
+      - {day: 7, hour: 21, kind: slow_service, severity: 2}
+      - {day: 5, hour: 19, kind: dropped_call, severity: 3}
+      - {day: 3, hour: 22, kind: slow_service, severity: 3}
+      - {day: 1, hour: 20, kind: dropped_call, severity: 3}
+  billing_mess:
+    description: Wrong bill, dispute, no resolution.
+    events:
+      - {day: 5, hour: 10, kind: bill_dispute, severity: 3, note: Charged for a service never ordered}
+      - {day: 4, hour: 15, kind: support_call, severity: 3}
+      - {day: 2, hour: 13, kind: support_unanswered, severity: 3, note: Refund promised, nothing happened}
+      - {day: 1, hour: 11, kind: bill_dispute, severity: 4, note: Charged again}
+
+# What each internal task means. These run by themselves ("self-healing"): they are internal work items, nothing is sent to the
+# customer. Anything that CONTACTS the customer or offers something still goes through the guardrails and a named approver.
+tasks:
+  engineering_check: Check the line / area for faults and confirm the service is stable.
+  line_quality_check: Run a line-quality test and look at the history of drops on this line.
+  priority_callback: Put the customer's open tickets at the front of the queue for a senior agent.
+  billing_review: Review the disputed charges and prepare a correction.
+  senior_review: A senior agent reviews the whole history.

@@ -1,0 +1,10 @@
+models/*.sqlite
+*.sqlite
+outbox.csv
+mlflow.db
+mlruns/
+__pycache__/
+.pytest_cache/
+train.log
+config/users.yaml
+config/initial_passwords.txt

@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+node_modules/
+web/dist/
+mlruns/
+mlflow.db
+message_log.sqlite
+outbox/
+_staging/
+downloads/
+train.log
+.env

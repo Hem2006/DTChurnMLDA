@@ -1,0 +1,19 @@
+flagged 522 of 1409
+0 3s
+50 59s
+100 110s
+150 162s
+200 212s
+250 246s
+300 275s
+350 304s
+400 334s
+450 363s
+500 392s
+off {'recommend': 522} {}
+shipped_state_unknown {'recommend_pending_approval': 522} {'contact_cap_unset': 522, 'unknown_state': 522, 'discount_cap_unset': 467}
+shipped_state_clean {'recommend_pending_approval': 522} {'contact_cap_unset': 522, 'discount_cap_unset': 467}
+shipped_state_simulated {'recommend_pending_approval': 460, 'escalate_to_human': 62} {'contact_cap_unset': 460, 'discount_cap_unset': 411, 'unknown_state': 41, 'escalated_account': 23, 'vulnerable_account': 39}
+hypothetical_limits_state_clean {'recommend': 522} {}
+hypothetical_limits_state_simulated {'recommend': 272, 'recommend_pending_approval': 41, 'no_action': 147, 'escalate_to_human': 62} {'discount_cap_exceeded': 209, 'unknown_state': 41, 'contact_cap_exceeded': 147, 'escalated_account': 23, 'vulnerable_account': 39}
+replay check {'sampled_customers': 27, 'comparisons': 54, 'mismatches': 0}

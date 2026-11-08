@@ -1,0 +1,39 @@
+# Guardrail policy. Enforced in code (src/guardrails.py), no LLM involved.
+# The two numeric limits are POLICY numbers only the business can set. They are null on purpose: while a limit is null, every action it
+# governs comes back needs_human_approval with the reason. Nothing here is invented.
+max_discount_pct_per_customer_per_quarter: null   # total discount % one customer may get in a quarter
+max_contacts_per_month: null                      # retention contacts per customer per month
+max_message_chars: 700
+
+# Fixed rules (not switchable): vulnerable or escalated accounts are never contacted, they go to a human; unknown account state needs approval.
+
+pressure_language:
+  - act now
+  - act fast
+  - last chance
+  - final offer
+  - final notice
+  - limited time
+  - limited offer
+  - only today
+  - today only
+  - hurry
+  - urgent
+  - urgently
+  - immediately
+  - before it's too late
+  - before it is too late
+  - don't miss out
+  - do not miss out
+  - you must
+  - you have to
+  - you will lose
+  - you'll lose
+  - if you leave
+  - or else
+  - expires soon
+  - running out
+  - once in a lifetime
+  - guaranteed
+  - risk-free
+  - no obligation

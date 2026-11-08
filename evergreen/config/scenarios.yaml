@@ -1,0 +1,33 @@
+# Scenario library for the digital twin (a MODEL-SENSITIVITY tool, not a causal estimate).
+# cost_per_customer is null until config.yaml (scenario_costs) supplies it; do_nothing costs nothing by definition.
+# requires / not_applicable_if are matched against the customer's current values; a failing rule yields not_applicable with a reason.
+scenarios:
+  - name: do_nothing
+    description: No change (reference row; risk_drop is 0 by construction).
+    changes: {}
+    cost_per_customer: 0
+
+  - name: price_cut_10
+    description: 10% discount on MonthlyCharges.
+    changes: {discount_pct: 10}
+    cost_per_customer: null
+
+  - name: contract_one_year
+    description: Move to a one-year contract.
+    changes: {Contract: One year}
+    not_applicable_if: {Contract: [One year, Two year]}
+    cost_per_customer: null
+
+  - name: add_tech_support
+    description: Add tech support.
+    changes: {TechSupport: "Yes"}
+    requires: {InternetService: [DSL, Fiber optic]}
+    not_applicable_if: {TechSupport: ["Yes"]}
+    cost_per_customer: null
+
+  - name: combined_package
+    description: One-year contract, tech support and a 5% discount.
+    changes: {Contract: One year, TechSupport: "Yes", discount_pct: 5}
+    requires: {InternetService: [DSL, Fiber optic]}
+    not_applicable_if: {Contract: [Two year]}
+    cost_per_customer: null

@@ -1,0 +1,30 @@
+# Business numbers. Leave null until real figures exist; nothing here may be invented.
+#
+# Threshold = offer_cost / (success_rate * customer_value). While any of the three is null the served threshold is the
+# labelled PLACEHOLDER from churn_model_meta.json and every API response says so.
+offer_cost: null       # cost of one retention offer, in money
+customer_value: null   # value kept if a would-be churner stays (e.g. remaining lifetime margin)
+success_rate: null     # share of would-be churners an offer actually keeps (0-1)
+
+# Digital twin (model-sensitivity tool, NOT a causal estimate).
+# If set (e.g. 0.3), every twin risk_drop is multiplied by it and both raw and adjusted values are shown. No default.
+twin_effect_realization: null
+# Per-scenario cost per customer, by scenario name, e.g. {price_cut_10: 5.0}. Overrides cost_per_customer in scenarios.yaml.
+# Include the revenue given up by a discount. Null/missing -> expected_net_value stays null.
+scenario_costs: null
+
+# ---------------------------------------------------------------------------------------------------------------------------
+# SIMULATED uplift (not real data). The Telco dataset has NO treatment column, so treatment and its effect are SIMULATED
+# from the rules below. The numbers are arbitrary ASSUMPTIONS chosen only to exercise the T-learner pipeline; they are NOT
+# findings, NOT business numbers, and must never be presented as measured retention results. Change them freely.
+uplift_simulation:
+  seed: 42
+  # Assignment rule: treatment is randomised, independent of customer features (like an A/B test),
+  # with this probability of being treated.
+  treatment_probability: 0.5
+  # Effect assumption: a treated customer who would have churned is retained with this probability, by current Contract.
+  # (So the assumed true uplift of customer x = P(churn | x) * retention_probability[Contract of x].)
+  retention_probability_by_contract:
+    Month-to-month: 0.30
+    One year: 0.10
+    Two year: 0.0
