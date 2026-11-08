@@ -1,7 +1,6 @@
 # Evergreen churn service
 
 Calibrated XGBoost churn model (isotonic, 5-fold ensemble) behind a FastAPI service, plus a digital-twin what-if tool.
-Rules for this project are in `CLAUDE.md`.
 
 ## Setup and tests
 
