@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 import pandas as pd
+import yaml
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.responses import JSONResponse
 from starlette.middleware.gzip import GZipMiddleware
@@ -19,6 +20,7 @@ from pydantic import BaseModel, ConfigDict, Field, create_model
 
 import churn_serving as cs
 from app import agent as ag
+from app import auth
 from app import automation as au
 from app import galaxy as gx
 from app import guardrails as gr
@@ -29,6 +31,7 @@ from app import pipeline as pl
 from app import recommend as rec
 from app import twin as tw
 from app import uplift as up
+from app import workflow as wf
 
 ROOT = Path(os.environ.get('CHURN_DIR', Path(__file__).resolve().parent.parent))
 
@@ -129,6 +132,39 @@ class EditMessageRequest(BaseModel):
     model_config = ConfigDict(extra='forbid')
     edited_by: str = Field(..., min_length=1, max_length=80)
     message: str = Field(..., min_length=1, max_length=2000)
+
+
+class LoginRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    user_id: str = Field(..., min_length=1, max_length=40)
+    pin: str = Field(..., min_length=1, max_length=80)
+
+
+class SubmitRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    note: str = Field(..., min_length=1, max_length=500)
+    first_name: str | None = Field(None, max_length=40)
+
+
+class WfApproveRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    first_name: str | None = Field(None, max_length=40)
+
+
+class WfReasonRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    reason: str = Field(..., min_length=1, max_length=500)
+
+
+class WfClearRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    note: str | None = Field(None, max_length=500)
+    message: str | None = Field(None, max_length=2000)
+
+
+class WfNoteRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    note: str = Field(..., min_length=1, max_length=500)
 
 
 class IncidentCustomer(BaseModel):
@@ -248,6 +284,50 @@ def require_key(x_api_key: str | None = Header(None)) -> None:
 
 _Q = [Depends(require_key)]
 
+PROTECTED_PREFIXES = ('/cases', '/agent/run', '/simulate', '/predict', '/recommend', '/message', '/twin', '/galaxy', '/incidents',
+                      '/autopilot', '/actions', '/automation', '/outbox', '/admin', '/workflow', '/auth/me')
+
+
+def current_user(authorization: str | None = Header(None)) -> dict | None:
+    """The signed-in person from the bearer token. None only when no token was sent AND login is not required (legacy open mode)."""
+    user = None
+    if authorization and authorization.lower().startswith('bearer '):
+        user = auth.verify_token(authorization[7:].strip())
+        if user is None:
+            raise HTTPException(401, 'your sign-in has expired; sign in again')
+    if user is None and auth.login_required():
+        raise HTTPException(401, 'sign in first')
+    return user
+
+
+def roles(*allowed: str):
+    """A signed-in person must hold one of these roles. With no token and CHURN_REQUIRE_LOGIN unset, the legacy open mode applies."""
+    def dep(user: dict | None = Depends(current_user)):
+        if user is not None and user['role'] not in allowed:
+            raise HTTPException(403, 'the %s role cannot do this; it is for: %s' % (user['role'], ', '.join(allowed)))
+        return user
+    return dep
+
+
+def person(*allowed: str):
+    """Like roles(), but a signed-in person is always required (the hand-off workflow records who did each step)."""
+    def dep(user: dict | None = Depends(current_user)):
+        if user is None:
+            raise HTTPException(401, 'sign in first')
+        if user['role'] not in allowed:
+            raise HTTPException(403, 'the %s role cannot do this; it is for: %s' % (user['role'], ', '.join(allowed)))
+        return user
+    return dep
+
+
+def legacy_write() -> None:
+    if auth.login_required():
+        raise HTTPException(403, 'with sign-in required, case actions go through /workflow so every step is tied to a role')
+
+
+_QR = _Q + [Depends(roles('analyst', 'manager', 'compliance'))]
+_QL = _Q + [Depends(legacy_write)]
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -256,6 +336,7 @@ async def lifespan(app: FastAPI):
     bundle['guardrails'] = gr.load_guardrails(ROOT / 'guardrails.yaml')
     bundle['uplift'] = up.load(ROOT / up.ARTIFACT)            # SIMULATED uplift model; None if not built
     app.state.incident_cfg = inc.load_config(ROOT / 'incidents.yaml')
+    app.state.auth = auth.load_users(ROOT / 'users.yaml')
     app.state.autopilot = ap.Autopilot(bundle, app.state.incident_cfg)
     app.state.autopilot_task = None
     app.state.bundle = bundle
@@ -577,7 +658,7 @@ def _llm(request: Request):
     return getattr(request.app.state, 'llm_client', 'auto')
 
 
-@app.post('/cases/ingest', dependencies=_Q)
+@app.post('/cases/ingest', dependencies=_QL)
 def cases_ingest(req: IngestRequest, request: Request):
     """Score customers and queue the outcome. Cases the guardrails clear get a validated message; the rest wait for a person."""
     recs = [{'customer_ref': r.customer_ref, 'first_name': r.first_name, 'customer': r.customer.model_dump(),
@@ -585,41 +666,163 @@ def cases_ingest(req: IngestRequest, request: Request):
     return pl.ingest(recs, _bundle(request), client=_llm(request), source='api')
 
 
-@app.get('/cases', dependencies=_Q)
+@app.get('/cases', dependencies=_QR)
 def cases_list(status: str | None = None, limit: int = 200):
     return {'summary': pl.summary(), 'cases': pl.list_cases(status, limit=max(1, min(limit, 1000)))}
 
 
-@app.get('/cases/{case_id}', dependencies=_Q)
+@app.get('/cases/{case_id}', dependencies=_QR)
 def cases_get(case_id: int):
     return pl.get_case(case_id)
 
 
-@app.post('/cases/{case_id}/approve', dependencies=_Q)
+@app.post('/cases/{case_id}/approve', dependencies=_QL)
 def cases_approve(case_id: int, req: ApproveRequest, request: Request):
     return pl.approve(case_id, req.approved_by, _bundle(request)['guardrails'], first_name=req.first_name, client=_llm(request))
 
 
-@app.post('/cases/{case_id}/first-name', dependencies=_Q)
+@app.post('/cases/{case_id}/first-name', dependencies=_QL)
 def cases_first_name(case_id: int, req: FirstNameRequest, request: Request):
     return pl.provide_first_name(case_id, req.first_name, _bundle(request)['guardrails'], client=_llm(request))
 
 
-@app.post('/cases/{case_id}/message', dependencies=_Q)
+@app.post('/cases/{case_id}/message', dependencies=_QL)
 def cases_edit_message(case_id: int, req: EditMessageRequest, request: Request):
     return pl.edit_message(case_id, req.message, _bundle(request)['guardrails'], edited_by=req.edited_by)
 
 
-@app.post('/cases/{case_id}/reject', dependencies=_Q)
+@app.post('/cases/{case_id}/reject', dependencies=_QL)
 def cases_reject(case_id: int, req: RejectRequest):
     return pl.reject(case_id, req.rejected_by, req.reason)
 
 
-@app.post('/outbox/export', dependencies=_Q)
+@app.post('/outbox/export', dependencies=_QL)
 def outbox_export():
     """Return the ready messages and mark them exported. Nothing is sent: the CRM sends them, matching customer_ref to contacts."""
     rows = pl.export_outbox()
     return {'count': len(rows), 'messages': rows}
+
+
+# ------------------------------------------------------------------ sign-in and the four-role hand-off (see app/auth.py, app/workflow.py)
+@app.middleware('http')
+async def login_gate(request: Request, call_next):
+    """With CHURN_REQUIRE_LOGIN=1 every data endpoint needs a valid token (n8n's callback and digest keep their own secrets)."""
+    p = request.url.path
+    if (auth.login_required() and p.startswith(PROTECTED_PREFIXES) and not (p.startswith('/actions/') and p.endswith('/callback'))
+            and p != '/automation/digest'):
+        h = request.headers.get('authorization', '')
+        if not (h.lower().startswith('bearer ') and auth.verify_token(h[7:].strip())):
+            return JSONResponse(status_code=401, content={'detail': 'sign in first'})
+    return await call_next(request)
+
+
+@app.exception_handler(wf.SeparationError)
+async def separation_handler(request: Request, exc: wf.SeparationError):
+    return JSONResponse(status_code=403, content={'detail': str(exc)})
+
+
+def _accounts(request: Request) -> dict:
+    return request.app.state.auth
+
+
+@app.get('/auth/accounts')
+def auth_accounts(request: Request):
+    return {'accounts': auth.public_accounts(_accounts(request)), 'login_required': auth.login_required(), 'demo': True}
+
+
+@app.post('/auth/login')
+def auth_login(req: LoginRequest, request: Request):
+    try:
+        out = auth.login(_accounts(request), req.user_id, req.pin)
+    except auth.AuthError as e:
+        wf.log_auth('login_failed', req.user_id[:40], None)
+        raise HTTPException(e.status, str(e))
+    wf.log_auth('login', out['user']['name'], out['user']['role'])
+    return out
+
+
+@app.get('/auth/me')
+def auth_me(user: dict = Depends(person('analyst', 'manager', 'compliance', 'admin'))):
+    return user
+
+
+_W = _Q
+
+
+@app.get('/workflow/board', dependencies=_W)
+def wf_board(user: dict = Depends(person('analyst', 'manager', 'compliance'))):
+    return wf.board()
+
+
+@app.get('/workflow/cases/{case_id}', dependencies=_W)
+def wf_case(case_id: int, user: dict = Depends(person('analyst', 'manager', 'compliance'))):
+    d = pl.get_case(case_id)
+    d['stage'] = wf.stage_of(d)
+    return d
+
+
+@app.post('/workflow/cases/{case_id}/submit', dependencies=_W)
+def wf_submit(case_id: int, req: SubmitRequest, request: Request, user: dict = Depends(person('analyst'))):
+    return wf.submit(case_id, user, req.note, _bundle(request)['guardrails'], first_name=req.first_name)
+
+
+@app.post('/workflow/cases/{case_id}/first-name', dependencies=_W)
+def wf_first_name(case_id: int, req: FirstNameRequest, request: Request, user: dict = Depends(person('analyst', 'manager'))):
+    return wf.name_it(case_id, user, req.first_name, _bundle(request)['guardrails'], client=_llm(request))
+
+
+@app.post('/workflow/cases/{case_id}/send-back', dependencies=_W)
+def wf_send_back(case_id: int, req: WfReasonRequest, user: dict = Depends(person('manager'))):
+    return wf.send_back(case_id, user, req.reason)
+
+
+@app.post('/workflow/cases/{case_id}/approve', dependencies=_W)
+def wf_approve(case_id: int, req: WfApproveRequest, request: Request, user: dict = Depends(person('manager'))):
+    return wf.approve(case_id, user, _bundle(request)['guardrails'], first_name=req.first_name, client=_llm(request))
+
+
+@app.post('/workflow/cases/{case_id}/reject', dependencies=_W)
+def wf_reject(case_id: int, req: WfReasonRequest, user: dict = Depends(person('manager', 'compliance'))):
+    return wf.reject(case_id, user, req.reason)
+
+
+@app.post('/workflow/cases/{case_id}/clear', dependencies=_W)
+def wf_clear(case_id: int, req: WfClearRequest, request: Request, user: dict = Depends(person('compliance'))):
+    return wf.clear(case_id, user, req.note, _bundle(request)['guardrails'], message=req.message)
+
+
+@app.post('/workflow/cases/{case_id}/care-handoff', dependencies=_W)
+def wf_care(case_id: int, req: WfNoteRequest, user: dict = Depends(person('compliance'))):
+    return wf.care_handoff(case_id, user, req.note)
+
+
+@app.post('/workflow/export', dependencies=_W)
+def wf_export(user: dict = Depends(person('compliance'))):
+    rows = wf.export(user)
+    return {'count': len(rows), 'messages': rows}
+
+
+@app.get('/admin/overview', dependencies=_W)
+def admin_overview(request: Request, user: dict = Depends(person('admin'))):
+    cfg = yaml.safe_load((ROOT / 'config.yaml').read_text(encoding='utf8')) or {}
+    gcfg = _bundle(request)['guardrails']
+    labels = [('offer_cost', 'Cost of one retention offer', cfg), ('customer_value', 'Value kept when a customer stays', cfg),
+              ('success_rate', 'Share of would-be leavers an offer keeps', cfg), ('twin_effect_realization', 'Twin effect scaling', cfg),
+              ('scenario_costs', 'Cost per option', cfg), ('max_discount_pct_per_customer_per_quarter', 'Discount limit per quarter (%)', gcfg),
+              ('max_contacts_per_month', 'Contacts allowed per month', gcfg)]
+    numbers = [{'key': k, 'label': t, 'set': src.get(k) is not None, 'value': src.get(k)} for k, t, src in labels]
+    board = wf.board()
+    return {'numbers': numbers, 'counts': board['counts'], 'stages': board['stages'], 'total_cases': len(board['cases']),
+            'duty_violations': wf.duty_violations(), 'health': health(request), 'recent_runs': ag.list_runs(limit=5),
+            'people': auth.public_accounts(_accounts(request)),
+            'settings': {'login_required': auth.login_required(), 'access_key_set': bool(os.environ.get('CHURN_API_KEY')),
+                         'assistant_key_set': bool(os.environ.get('ANTHROPIC_API_KEY')),
+                         'automation_configured': bool(os.environ.get('N8N_WEBHOOK_URL') and os.environ.get('N8N_SHARED_SECRET'))}}
+
+
+@app.get('/admin/audit', dependencies=_W)
+def admin_audit(limit: int = 200, user: dict = Depends(person('admin'))):
+    return {'events': wf.audit(max(1, min(limit, 1000)))}
 
 
 # ------------------------------------------------------------------ retention agent (see app/agent.py)
@@ -629,7 +832,7 @@ def agent_stages():
             'twin_label': tw.INTERPRETATION, 'default_sample': ag.DEFAULT_SAMPLE, 'default_max_twin': ag.DEFAULT_MAX_TWIN}
 
 
-@app.post('/agent/run', dependencies=_Q)
+@app.post('/agent/run', dependencies=_Q + [Depends(roles('analyst'))])
 def agent_run(req: AgentRunRequest, request: Request):
     """Start a run in the background; poll GET /agent/runs/{id}. Nothing is sent to any customer."""
     b = _bundle(request)
@@ -642,22 +845,22 @@ def agent_run(req: AgentRunRequest, request: Request):
     return ag.start(records, b, client=_llm(request), source=source, requested_by=req.requested_by, max_twin=req.max_twin)
 
 
-@app.get('/agent/runs', dependencies=_Q)
+@app.get('/agent/runs', dependencies=_QR)
 def agent_runs(limit: int = 20):
     return {'runs': ag.list_runs(limit=max(1, min(limit, 200)))}
 
 
-@app.get('/agent/runs/{run_id}', dependencies=_Q)
+@app.get('/agent/runs/{run_id}', dependencies=_QR)
 def agent_run_get(run_id: int):
     return ag.get_run(run_id)
 
 
-@app.get('/agent/runs/{run_id}/customers', dependencies=_Q)
+@app.get('/agent/runs/{run_id}/customers', dependencies=_QR)
 def agent_run_customers(run_id: int, request: Request, scope: str = 'all'):
     return {'customers': ag.run_customers(run_id, scope=scope, bundle=_bundle(request))}
 
 
-@app.get('/agent/runs/{run_id}/customers/{ref}', dependencies=_Q)
+@app.get('/agent/runs/{run_id}/customers/{ref}', dependencies=_QR)
 def agent_run_customer(run_id: int, ref: str, request: Request):
     return ag.customer_detail(run_id, ref, bundle=_bundle(request))
 

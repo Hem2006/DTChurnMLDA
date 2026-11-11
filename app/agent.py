@@ -503,5 +503,6 @@ def customer_detail(run_id: int, ref: str, *, bundle: Mapping | None = None, pat
     if d['case_id'] is not None:
         c = pl.get_case(d['case_id'], path=path)
         d['case'] = {k: c.get(k) for k in ('id', 'status', 'first_name', 'message', 'message_source', 'approved_by', 'note', 'events',
-                                           'approvals_needed', 'action_name')}
+                                           'approvals_needed', 'action_name', 'submitted_by', 'submitted_uid', 'submitted_ts', 'submit_note',
+                                           'cleared_by', 'cleared_uid')}
     return d

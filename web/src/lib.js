@@ -18,6 +18,7 @@ export const CASE_STATUS = {
   exported: ['Handed to CRM', 'ok'],
   rejected: ['Rejected', 'muted'],
   escalated: ['Handed to a person', 'bad'],
+  care_handoff: ['Passed to the care team', 'info'],
   no_action: ['No action', 'muted'],
   invalid: ['Unusable row', 'bad'],
 }
@@ -26,6 +27,28 @@ export function caseStatusText(status) {
   if (status == null) return ['Not worked on this run', 'muted']
   return CASE_STATUS[status] || [String(status).replace(/_/g, ' '), 'muted']
 }
+
+// ---- the four roles and where a case is in the hand-off chain (stage names come from the server, app/workflow.py)
+export const ROLE_TEXT = {
+  analyst: ['Retention analyst', 'Runs the agent, studies each twin and sends cases to the manager.'],
+  manager: ['Retention manager', 'Approves, sends back or rejects what the analyst sends.'],
+  compliance: ['Compliance & care', 'Checks the approved message, releases it to the CRM and looks after protected accounts.'],
+  admin: ['System admin', 'Watches the system, the business numbers, the people and the audit trail.'],
+}
+export const STAGE_TEXT = {
+  analyst: ['With the analyst', 'warn'],
+  manager: ['Waiting for the manager', 'info'],
+  name: ['Needs the first name', 'info'],
+  compliance: ['Waiting for compliance', 'info'],
+  crm_ready: ['Cleared · ready for the CRM', 'ok'],
+  care: ['Protected account · with compliance', 'bad'],
+  closed: ['Closed', 'muted'],
+}
+/** [text, tone] for a hand-off stage. */
+export const stageText = stage => STAGE_TEXT[stage] || [String(stage).replace(/_/g, ' '), 'muted']
+/** Which stages need work from each role; the header badge adds them up. */
+export const ROLE_QUEUE = { analyst: ['analyst'], manager: ['manager'], compliance: ['compliance', 'care'], admin: [] }
+export const workCount = (role, counts) => (ROLE_QUEUE[role] || []).reduce((a, k) => a + ((counts || {})[k] || 0), 0)
 
 /** Guardrail approval reasons said plainly. Unknown text is passed through unchanged. */
 export function approvalText(s) {

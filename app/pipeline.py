@@ -49,6 +49,8 @@ MAPPING_KEYS = {'id_column', 'first_name_column', 'columns', 'account_state', 't
 DECISION_STATUS = {'recommend': 'needs_first_name', 'recommend_pending_approval': 'pending_approval',
                    'no_action': 'no_action', 'escalate_to_human': 'escalated'}
 OUTBOX_COLUMNS = ['case_id', 'customer_ref', 'first_name', 'offer_name', 'offer_description', 'message', 'approved_by', 'message_log_id']
+WORKFLOW_COLUMNS = ('submitted_by', 'submitted_uid', 'submitted_ts', 'submit_note', 'approved_uid', 'cleared_by', 'cleared_uid',
+                    'cleared_ts', 'clear_note', 'care_by', 'care_uid', 'care_note')
 
 
 class CaseError(Exception):
@@ -185,6 +187,10 @@ def _connect(path=None) -> sqlite3.Connection:
         CREATE INDEX IF NOT EXISTS cases_status ON cases (status);
         CREATE TABLE IF NOT EXISTS case_events (
             id INTEGER PRIMARY KEY AUTOINCREMENT, case_id INTEGER NOT NULL, ts TEXT NOT NULL, event TEXT NOT NULL, actor TEXT, detail TEXT);""")
+    have = {r[1] for r in con.execute('PRAGMA table_info(cases)')}          # hand-off columns (app/workflow.py), added to older databases
+    for col in WORKFLOW_COLUMNS:
+        if col not in have:
+            con.execute('ALTER TABLE cases ADD COLUMN %s TEXT' % col)
     return con
 
 
@@ -382,13 +388,14 @@ def reject(case_id: int, rejected_by: str, reason: str, *, path=None) -> dict:
         con.close()
 
 
-def export_outbox(out_path=None, *, path=None) -> list[dict]:
+def export_outbox(out_path=None, *, path=None, cleared_only=False, actor=None) -> list[dict]:
     """Hand the ready messages over. Writes a CSV (if out_path) FIRST, then marks the cases exported, so a failed write loses nothing.
-    Nothing is sent: the CRM / marketing team sends from the file, matching customer_ref to their contact details."""
+    Nothing is sent: the CRM / marketing team sends from the file, matching customer_ref to their contact details.
+    cleared_only=True (the signed-in workflow) exports only messages a compliance officer has cleared."""
     con = _connect(path)
     try:
         rows = []
-        for r in con.execute("SELECT * FROM cases WHERE status='ready' ORDER BY id"):
+        for r in con.execute("SELECT * FROM cases WHERE status='ready'%s ORDER BY id" % (' AND cleared_uid IS NOT NULL' if cleared_only else '')):
             offer = msg.offer_from_action(json.loads(r['recommendation_json'])['action'])
             rows.append({'case_id': r['id'], 'customer_ref': r['customer_ref'], 'first_name': r['first_name'], 'offer_name': r['action_name'],
                          'offer_description': offer['description'], 'message': r['message'], 'approved_by': r['approved_by'],
@@ -403,7 +410,7 @@ def export_outbox(out_path=None, *, path=None) -> list[dict]:
         ts = _now()
         for r in rows:
             con.execute("UPDATE cases SET status='exported', exported_ts=?, updated_ts=? WHERE id=? AND status='ready'", (ts, ts, r['case_id']))
-            _event(con, r['case_id'], 'exported', None, str(out_path) if out_path else 'returned')
+            _event(con, r['case_id'], 'exported', actor, str(out_path) if out_path else 'returned')
         con.commit()
         return rows
     finally:

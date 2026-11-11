@@ -1,19 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Papa from 'papaparse'
-import { AlertTriangle, ArrowRight, Check, CircleDashed, Clock, Download, FileUp, Loader2, Play, User, Users, X } from 'lucide-react'
+import { AlertTriangle, ArrowRight, Check, CircleDashed, Clock, FileUp, Loader2, Play, User, Users, X } from 'lucide-react'
 import { api } from '../api.js'
-import { ago, money, num, optionLabel, toCsv } from '../lib.js'
+import { ago, money, num, optionLabel } from '../lib.js'
 
 const ICON = { pending: CircleDashed, running: Loader2, done: Check, waiting: Clock, failed: X, skipped: CircleDashed }
 const DECISION = { recommend: 'Offer ready', recommend_pending_approval: 'Offer needs approval', no_action: 'No action', escalate_to_human: 'Handed to a person' }
-const OUTBOX_COLUMNS = ['case_id', 'customer_ref', 'first_name', 'offer_name', 'offer_description', 'message', 'approved_by', 'message_log_id']
-
-function download(name, text) {
-  const url = URL.createObjectURL(new Blob([text], { type: 'text/csv' }))
-  const a = Object.assign(document.createElement('a'), { href: url, download: name })
-  document.body.appendChild(a); a.click(); a.remove()
-  setTimeout(() => URL.revokeObjectURL(url), 1000)
-}
 
 function RunForm({ who, stages, busy, onStart }) {
   const [source, setSource] = useState('demo')
@@ -103,18 +95,8 @@ function Bars({ items }) {
   )
 }
 
-function StepDetail({ run, step, onOpenCustomers, onOpenApprovals, onExported }) {
-  const [exp, setExp] = useState({ busy: false, msg: null, err: null })
+function StepDetail({ run, step, onOpenCustomers, onOpenApprovals }) {
   const d = step.detail || {}
-  const exportNow = async () => {
-    setExp({ busy: true, msg: null, err: null })
-    try {
-      const r = await api('/outbox/export', {})
-      if (r.count) download(`evergreen_outbox_${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.csv`, toCsv(r.messages, OUTBOX_COLUMNS))
-      setExp({ busy: false, msg: r.count ? `${r.count} message${r.count === 1 ? '' : 's'} handed to the CRM file.` : 'Nothing was ready.', err: null })
-      onExported()
-    } catch (e) { setExp({ busy: false, msg: null, err: e.message }) }
-  }
   return (
     <div className="card step-detail">
       <div className="sd-h">
@@ -165,16 +147,13 @@ function StepDetail({ run, step, onOpenCustomers, onOpenApprovals, onExported })
       {step.key === 'approve' && run.status === 'done' && (
         <>
           <div className="kpis"><div><b>{num(d.waiting)}</b><span>waiting</span></div><div><b>{num(d.approved)}</b><span>approved</span></div><div><b>{num(d.rejected)}</b><span>rejected</span></div></div>
-          <button className="btn primary" onClick={onOpenApprovals}>Open approvals <ArrowRight size={15} /></button>
+          <button className="btn primary" onClick={onOpenApprovals}>Open the case tracker <ArrowRight size={15} /></button>
         </>
       )}
       {step.key === 'handoff' && run.status === 'done' && (
         <>
           <div className="kpis"><div><b>{num(d.ready)}</b><span>messages ready</span></div><div><b>{num(d.exported)}</b><span>handed to the CRM</span></div></div>
-          <button className="btn primary" disabled={exp.busy || !d.ready} onClick={exportNow}>{exp.busy ? <Loader2 className="spin" size={15} /> : <Download size={15} />} Export ready messages for the CRM</button>
-          <p className="tiny muted">Exports every ready message in the queue as a CSV for the CRM team. Nothing is sent to a customer from Evergreen.</p>
-          {exp.msg && <p className="ok-text small">{exp.msg}</p>}
-          {exp.err && <p className="err">{exp.err}</p>}
+          <p className="tiny muted">Compliance checks each approved message and releases the cleared ones to the CRM team as a file. You can follow every case in the Case tracker. Nothing is sent to a customer from Evergreen.</p>
         </>
       )}
       {['score', 'prioritise', 'twin', 'decide', 'queue'].includes(step.key) && step.status === 'done' && (
@@ -248,7 +227,7 @@ export default function Agent({ who, stages, onOpenCustomers, onOpenApprovals, o
               </div>
               {run.error && <p className="note bad"><AlertTriangle size={14} /> {run.error}</p>}
               <Pipeline steps={run.steps} active={active} setActive={pick} />
-              {step && <StepDetail run={run} step={step} onOpenCustomers={onOpenCustomers} onOpenApprovals={onOpenApprovals} onExported={() => { loadRun(); onChange() }} />}
+              {step && <StepDetail run={run} step={step} onOpenCustomers={onOpenCustomers} onOpenApprovals={onOpenApprovals} />}
             </>
           ) : runs && runs.length === 0 ? (
             <div className="card empty">

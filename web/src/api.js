@@ -9,6 +9,15 @@ export function setApiKey(v) {
   try { v ? sessionStorage.setItem(KEY, v) : sessionStorage.removeItem(KEY) } catch { /* storage blocked: key lives for this page only */ }
 }
 
+const TOKEN = 'evergreen.token'
+export function getToken() {
+  try { return sessionStorage.getItem(TOKEN) || '' } catch { return '' }
+}
+
+export function setToken(v) {
+  try { v ? sessionStorage.setItem(TOKEN, v) : sessionStorage.removeItem(TOKEN) } catch { /* storage blocked: sign-in lasts for this page only */ }
+}
+
 export function formatDetail(d) {
   if (d == null) return 'Request failed'
   if (typeof d === 'string') return d
@@ -33,6 +42,8 @@ export async function api(path, body) {
   if (body !== undefined) headers['Content-Type'] = 'application/json'
   const k = getApiKey()
   if (k) headers['X-API-Key'] = k
+  const t = getToken()
+  if (t) headers.Authorization = 'Bearer ' + t
   let r
   try {
     r = await fetch(path, { method: body !== undefined ? 'POST' : 'GET', headers, body: body !== undefined ? JSON.stringify(body) : undefined })
@@ -41,6 +52,7 @@ export async function api(path, body) {
   }
   let data = null
   try { data = await r.json() } catch { /* empty body */ }
+  if (r.status === 401 && t) window.dispatchEvent(new Event('evergreen:signed-out'))
   if (!r.ok) throw new ApiError(r.status, data && data.detail !== undefined ? data.detail : r.statusText)
   return data
 }

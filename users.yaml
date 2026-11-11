@@ -1,0 +1,22 @@
+# DEMO accounts for the four roles. These are made-up people and a shared demo PIN, for the project demo only.
+# Real deployments: replace this with the company's identity provider; the role checks in app/auth.py and app/workflow.py stay.
+# CHURN_DEMO_PIN overrides demo_pin. CHURN_REQUIRE_LOGIN=1 makes every case / agent / admin endpoint need a signed-in user.
+demo_pin: evergreen
+
+users:
+  - id: dana
+    name: Dana Rivera
+    role: analyst
+    title: Retention analyst
+  - id: marcus
+    name: Marcus Lee
+    role: manager
+    title: Retention manager
+  - id: priya
+    name: Priya Nair
+    role: compliance
+    title: Compliance & account-care officer
+  - id: sam
+    name: Sam Okafor
+    role: admin
+    title: Data scientist / system admin

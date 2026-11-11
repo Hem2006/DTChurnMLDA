@@ -1,8 +1,8 @@
 import { Fragment, useEffect, useState } from 'react'
-import { AlertTriangle, Check, FlaskConical, Loader2, RotateCcw, ShieldAlert, Sparkles, X } from 'lucide-react'
+import { AlertTriangle, FlaskConical, Loader2, RotateCcw, Send, ShieldAlert, Sparkles, X } from 'lucide-react'
 import { api } from '../api.js'
 import { useApiCall } from '../hooks.js'
-import { approvalReasons, caseStatusText, humanize, money, optionLabel, pctRisk, pts, setEdit } from '../lib.js'
+import { ago, approvalReasons, caseStatusText, humanize, money, optionLabel, pctRisk, pts, setEdit } from '../lib.js'
 
 const ADDONS = ['TechSupport', 'OnlineSecurity', 'OnlineBackup', 'DeviceProtection']
 const ALLOWED = { permitted: ['Allowed', 'ok'], needs_human_approval: ['Needs approval', 'warn'], blocked: ['Blocked', 'bad'] }
@@ -71,10 +71,10 @@ function WhatIf({ customer, meta, threshold, placeholder }) {
   )
 }
 
-function CaseBox({ d, who, onChanged }) {
+function CaseBox({ d, user, onChanged }) {
   const cs = d.case
   const [first, setFirst] = useState(cs?.first_name || '')
-  const [reason, setReason] = useState('')
+  const [note, setNote] = useState('')
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState(null)
   useEffect(() => { setFirst(cs?.first_name || '') }, [cs?.first_name])
@@ -88,28 +88,33 @@ function CaseBox({ d, who, onChanged }) {
   return (
     <section className="tw-sec">
       <h3>Case #{cs.id} <span className={'pill tone-' + tone}>{label}</span></h3>
-      {cs.status === 'pending_approval' && (
+      {cs.status === 'pending_approval' && !cs.submitted_uid && (
         <>
-          <p className="small">The agent proposes <b>{optionLabel(cs.action_name)}</b>. It needs a person because:</p>
+          <p className="small">The agent proposes <b>{optionLabel(cs.action_name)}</b>. A person has to approve it because:</p>
           <ul className="plain small">{approvalReasons(cs.approvals_needed).map(r => <li key={r}>{r}</li>)}</ul>
+          {cs.note && <p className="note warn">Sent back by the manager: {cs.note}</p>}
           {!cs.first_name && <><label className="lbl">Customer's first name (for the message)</label><input className="input" value={first} onChange={e => setFirst(e.target.value)} maxLength={40} /></>}
+          <label className="lbl">Your note for the manager</label>
+          <textarea className="input" rows={3} value={note} onChange={e => setNote(e.target.value)} maxLength={500} placeholder="Why this option fits this customer, and anything the manager should check (e.g. the twin's caution)." />
           <div className="row-btns">
-            <button className="btn primary" disabled={busy} onClick={() => go(`/cases/${cs.id}/approve`, { approved_by: who, ...(first.trim() && !cs.first_name ? { first_name: first.trim() } : {}) })}>
-              {busy ? <Loader2 className="spin" size={15} /> : <Check size={15} />} Approve as {who}
+            <button className="btn primary" disabled={busy || !note.trim() || user?.role !== 'analyst'}
+              onClick={() => go(`/workflow/cases/${cs.id}/submit`, { note: note.trim(), ...(first.trim() && !cs.first_name ? { first_name: first.trim() } : {}) })}>
+              {busy ? <Loader2 className="spin" size={15} /> : <Send size={15} />} Send to the manager
             </button>
           </div>
-          <div className="reject">
-            <input className="input" placeholder="Reason to reject" value={reason} onChange={e => setReason(e.target.value)} maxLength={500} />
-            <button className="btn ghost" disabled={busy || !reason.trim()} onClick={() => go(`/cases/${cs.id}/reject`, { rejected_by: who, reason: reason.trim() })}>Reject</button>
-          </div>
+          <p className="tiny muted">You cannot approve it yourself: the manager decides, then compliance clears the message.</p>
         </>
+      )}
+      {cs.status === 'pending_approval' && cs.submitted_uid && (
+        <p className="small"><Send size={13} /> Sent to the manager by <b>{cs.submitted_by}</b> {ago(cs.submitted_ts)}. Proposed: <b>{optionLabel(cs.action_name)}</b>.{cs.submit_note && <> Your note: “{cs.submit_note}”</>}</p>
       )}
       {cs.status === 'needs_first_name' && (
         <div className="reject">
           <input className="input" placeholder="Customer's first name" value={first} onChange={e => setFirst(e.target.value)} maxLength={40} />
-          <button className="btn primary" disabled={busy || !first.trim()} onClick={() => go(`/cases/${cs.id}/first-name`, { first_name: first.trim() })}>Draft message</button>
+          <button className="btn primary" disabled={busy || !first.trim()} onClick={() => go(`/workflow/cases/${cs.id}/first-name`, { first_name: first.trim() })}>Draft message</button>
         </div>
       )}
+      {cs.status === 'ready' && <p className="small">{cs.cleared_uid ? <>Cleared by <b>{cs.cleared_by}</b>; compliance releases it to the CRM.</> : <>Approved by <b>{cs.approved_by}</b>; waiting for compliance to check the message.</>}</p>}
       {cs.message && <blockquote className="msg">{cs.message}<footer>{cs.message_source === 'template' ? 'From the approved template' : cs.message_source === 'human_edited' ? 'Edited by a person' : 'Drafted by the assistant and checked'} · approved by {cs.approved_by}</footer></blockquote>}
       {cs.note && <p className="small muted">Note: {cs.note}</p>}
       {err && <p className="err">{err}</p>}
@@ -117,7 +122,7 @@ function CaseBox({ d, who, onChanged }) {
   )
 }
 
-export default function CustomerTwin({ runId, refId, meta, who, onClose, onChanged }) {
+export default function CustomerTwin({ runId, refId, meta, user, onClose, onChanged }) {
   const [d, setD] = useState(null)
   const [err, setErr] = useState(null)
   const load = () => api(`/agent/runs/${runId}/customers/${encodeURIComponent(refId)}`).then(setD).catch(e => setErr(e.message))
@@ -184,7 +189,7 @@ export default function CustomerTwin({ runId, refId, meta, who, onClose, onChang
               </section>
             )}
 
-            <CaseBox d={d} who={who} onChanged={changed} />
+            <CaseBox d={d} user={user} onChanged={changed} />
             <WhatIf customer={c} meta={meta} threshold={meta.threshold} placeholder={meta.threshold_is_placeholder} />
             <section className="tw-sec">
               <h3>Customer profile</h3>

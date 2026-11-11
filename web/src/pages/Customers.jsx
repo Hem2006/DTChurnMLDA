@@ -6,7 +6,7 @@ import CustomerTwin from '../components/CustomerTwin.jsx'
 
 const SCOPES = [['prioritised', 'Worked on by the agent'], ['above', 'Above the alert line'], ['all', 'Everyone'], ['rejected', 'Unusable rows']]
 
-export default function Customers({ who, meta, runId, setRunId, onChange }) {
+export default function Customers({ who, user, meta, runId, setRunId, onChange }) {
   const [runs, setRuns] = useState(null)
   const [scope, setScope] = useState('prioritised')
   const [rows, setRows] = useState(null)
@@ -98,7 +98,7 @@ export default function Customers({ who, meta, runId, setRunId, onChange }) {
           </div>
         )}
       </div>
-      {open && <CustomerTwin runId={runId} refId={open} meta={meta} who={who} onClose={() => setOpen(null)} onChanged={() => { load(); onChange() }} />}
+      {open && <CustomerTwin runId={runId} refId={open} meta={meta} who={who} user={user} onClose={() => setOpen(null)} onChanged={() => { load(); onChange() }} />}
     </div>
   )
 }

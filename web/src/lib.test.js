@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { pctRisk, changesText, cohortCurve, filterMask, leftBy, lostAt, money, pct, revenueCurve, riskColor, setEdit, signed, survival } from './lib.js'
+import { ROLE_TEXT, caseStatusText, stageText, workCount, pctRisk, changesText, cohortCurve, filterMask, leftBy, lostAt, money, pct, revenueCurve, riskColor, setEdit, signed, survival } from './lib.js'
 
 describe('survival (ILLUSTRATIVE: p read as leaving within 12 months, constant hazard)', () => {
   it('is 1 at month 0 and 1-p at month 12', () => {
@@ -123,5 +123,23 @@ describe('retention app helpers (plain language)', () => {
     expect(pts(0.5, 0.377)).toBe('−12.3 pts')
     expect(pts(0.2, 0.25)).toBe('+5.0 pts')
     expect(pts(null, 0.2)).toBe('–')
+  })
+})
+
+describe('roles and hand-off stages', () => {
+  it('names the four roles and every stage in plain words', () => {
+    expect(Object.keys(ROLE_TEXT)).toEqual(['analyst', 'manager', 'compliance', 'admin'])
+    expect(stageText('manager')).toEqual(['Waiting for the manager', 'info'])
+    expect(stageText('crm_ready')[1]).toBe('ok')
+    expect(stageText('weird_new_stage')).toEqual(['weird new stage', 'muted'])
+    expect(caseStatusText('care_handoff')[0]).toBe('Passed to the care team')
+  })
+  it('counts only the work that is waiting for that role', () => {
+    const counts = { analyst: 3, manager: 2, compliance: 4, care: 1, crm_ready: 9, closed: 5 }
+    expect(workCount('analyst', counts)).toBe(3)
+    expect(workCount('manager', counts)).toBe(2)
+    expect(workCount('compliance', counts)).toBe(5)
+    expect(workCount('admin', counts)).toBe(0)
+    expect(workCount('manager', undefined)).toBe(0)
   })
 })

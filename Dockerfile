@@ -24,7 +24,7 @@ RUN --mount=type=secret,id=cacert \
     pip install --no-cache-dir -r requirements.txt
 
 COPY app ./app
-COPY churn_serving.py config.yaml scenarios.yaml guardrails.yaml pipeline.yaml ./
+COPY churn_serving.py config.yaml scenarios.yaml guardrails.yaml pipeline.yaml users.yaml ./
 COPY churn_model.joblib churn_xgb_explainer.joblib churn_logreg_ref.joblib churn_uplift_sim.joblib churn_model_meta.json ./
 COPY --from=web /web/dist ./web/dist
 
